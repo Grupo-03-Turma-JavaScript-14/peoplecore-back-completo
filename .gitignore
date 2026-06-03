@@ -73,7 +73,7 @@ nest-cli.json
 # Cache
 .cache/
 
-.env
-.env.*
-docker-compose.dev.yml
+.env.example
 docker-compose.yml
+docker-compose.dev.yml
+Dockerfile
