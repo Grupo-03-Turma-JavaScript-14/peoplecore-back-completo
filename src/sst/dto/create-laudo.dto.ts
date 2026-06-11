@@ -5,11 +5,11 @@ import { TipoLaudo } from '../entities/laudo.entity';
 export class CreateLaudoDto {
   @ApiProperty({ enum: TipoLaudo })
   @IsEnum(TipoLaudo)
-  tipo: TipoLaudo;
+  tipo!: TipoLaudo;
 
   @ApiProperty({ example: 'Dr. Carlos Engenheiro' })
   @IsString()
-  responsavelTecnico: string;
+  responsavelTecnico!: string;
 
   @ApiPropertyOptional({ example: '12345-D/SP' })
   @IsOptional() @IsString()
@@ -17,11 +17,11 @@ export class CreateLaudoDto {
 
   @ApiProperty({ example: '2025-01-01' })
   @IsDateString()
-  dataEmissao: string;
+  dataEmissao!: string;
 
   @ApiProperty({ example: '2026-01-01' })
   @IsDateString()
-  dataVencimento: string;
+  dataVencimento!: string;
 
   @ApiPropertyOptional()
   @IsOptional() @IsString()

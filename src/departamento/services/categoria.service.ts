@@ -15,7 +15,6 @@ export class CategoriaService {
     }
 
     async findById(id: number): Promise<Categoria> {
-
         let categoria = await this.categoriaRepository.findOne({
             where: {
                 id
@@ -40,19 +39,20 @@ export class CategoriaService {
         return await this.categoriaRepository.save(categoria);
     }
 
-    async update(categoria: Categoria): Promise<Categoria> {
-
-        await this.findById(categoria.id);
-
-        return await this.categoriaRepository.save(categoria);
+    async update(id: number, categoria: Categoria): Promise<Categoria> {
+        
+        await this.findById(id);
+        
+        await this.categoriaRepository.update(id, {
+            departamento: categoria.departamento
+        });
+        
+        // Retorna o departamento atualizado
+        return this.findById(id);
     }
 
     async delete(id: number): Promise<DeleteResult> {
-
         await this.findById(id);
-
         return await this.categoriaRepository.delete(id);
-
     }
-
 }

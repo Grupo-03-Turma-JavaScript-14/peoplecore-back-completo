@@ -18,35 +18,35 @@ export enum TipoTreinamento {
 @Entity({ name: 'tb_treinamento' })
 export class Treinamento {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ length: 255 })
-  nome: string;
+  nome!: string;
 
   @Column({ length: 1000, nullable: true })
-  descricao: string;
+  descricao!: string;
 
   @Column({ type: 'enum', enum: TipoTreinamento })
-  tipo: TipoTreinamento;
+  tipo!: TipoTreinamento;
 
   @Column({ type: 'enum', enum: ModalidadeTreinamento })
-  modalidade: ModalidadeTreinamento;
+  modalidade!: ModalidadeTreinamento;
 
   @Column()
-  cargaHoraria: number;
+  cargaHoraria!: number;
 
   @Column({ length: 20, nullable: true })
-  nrRelacionada: string;
+  nrRelacionada!: string;
 
   @Column({ nullable: true })
-  validadeMeses: number;
+  validadeMeses!: number;
 
   @Column({ default: true })
-  ativo: boolean;
+  ativo!: boolean;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @UpdateDateColumn()
-  atualizadoEm: Date;
+  atualizadoEm!: Date;
 }

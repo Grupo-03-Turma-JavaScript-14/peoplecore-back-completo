@@ -13,31 +13,31 @@ export enum StatusInscricao {
 @Entity({ name: 'tb_inscricao_treinamento' })
 export class Inscricao {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: 'enum', enum: StatusInscricao, default: StatusInscricao.INSCRITO })
-  status: StatusInscricao;
+  status!: StatusInscricao;
 
   @Column({ type: 'date' })
-  dataInicio: Date;
+  dataInicio!: Date;
 
   @Column({ type: 'date', nullable: true })
-  dataConclusao: Date;
+  dataConclusao!: Date;
 
   @Column('float', { nullable: true })
-  nota: number;
+  nota!: number;
 
   @Column({ length: 500, nullable: true })
-  observacao: string;
+  observacao!: string;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @ManyToOne(() => Funcionario)
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 
   @ManyToOne(() => Treinamento)
   @JoinColumn({ name: 'treinamento_id' })
-  treinamento: Treinamento;
+  treinamento!: Treinamento;
 }

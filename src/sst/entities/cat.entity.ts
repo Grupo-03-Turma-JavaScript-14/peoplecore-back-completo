@@ -2,62 +2,65 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { Funcionario } from '../../funcionario/entities/funcionario.entity';
 
 export enum TipoCAT {
-  INICIAL    = 'INICIAL',
+  INICIAL = 'INICIAL',
   REABERTURA = 'REABERTURA',
   COMUNICACAO_OBITO = 'COMUNICACAO_OBITO',
 }
 
 export enum GravidadeAcidente {
-  LEVE   = 'LEVE',
-  GRAVE  = 'GRAVE',
-  FATAL  = 'FATAL',
+  LEVE = 'LEVE',
+  GRAVE = 'GRAVE',
+  FATAL = 'FATAL',
 }
 
 @Entity({ name: 'tb_cat' })
 export class Cat {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: 'enum', enum: TipoCAT, default: TipoCAT.INICIAL })
-  tipo: TipoCAT;
+  tipo!: TipoCAT;
 
   @Column({ type: 'enum', enum: GravidadeAcidente })
-  gravidade: GravidadeAcidente;
+  gravidade!: GravidadeAcidente;
 
   @Column({ type: 'datetime' })
-  dataAcidente: Date;
+  dataAcidente!: Date;
 
   @Column({ length: 500 })
-  descricaoAcidente: string;
+  descricaoAcidente!: string;
 
   @Column({ length: 255 })
-  parteAtingida: string;
+  parteAtingida!: string;
 
   @Column({ length: 255 })
-  agenteCausador: string;
+  agenteCausador!: string;
 
   @Column({ length: 255, nullable: true })
-  localAcidente: string;
+  localAcidente!: string;
 
   @Column({ default: false })
-  enviadoEsocial: boolean;
+  enviadoEsocial!: boolean;
 
   @Column({ length: 100, nullable: true })
-  protocoloEsocial: string;
+  protocoloEsocial!: string;
 
   @Column({ length: 500, nullable: true })
-  planoAcao: string;
+  planoAcao!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataAfastamento: Date;
+  dataAfastamento!: Date | null;  // ← ALTERADO
 
   @Column({ type: 'date', nullable: true })
-  dataRetorno: Date;
+  dataRetorno!: Date | null;  // ← ALTERADO
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
+
+  @Column({ length: 500, nullable: true })
+  urlDocumento!: string;
 
   @ManyToOne(() => Funcionario)
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 }

@@ -11,30 +11,30 @@ export enum TipoMovimentacao {
 @Entity({ name: 'tb_promocao' })
 export class Promocao {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: 'enum', enum: TipoMovimentacao })
-  tipo: TipoMovimentacao;
+  tipo!: TipoMovimentacao;
 
   @Column({ length: 255 })
-  cargoAnterior: string;
+  cargoAnterior!: string;
 
   @Column({ length: 255 })
-  cargoNovo: string;
+  cargoNovo!: string;
 
   @Column('float')
-  salarioAnterior: number;
+  salarioAnterior!: number;
 
   @Column('float')
-  salarioNovo: number;
+  salarioNovo!: number;
 
   @Column({ length: 500, nullable: true })
-  motivo: string;
+  motivo!: string;
 
   @CreateDateColumn()
-  dataMovimentacao: Date;
+  dataMovimentacao!: Date;
 
   @ManyToOne(() => Funcionario, { eager: true })
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 }

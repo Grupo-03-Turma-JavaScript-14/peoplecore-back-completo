@@ -5,7 +5,7 @@ import { ModalidadeTreinamento, TipoTreinamento } from '../entities/treinamento.
 export class CreateTreinamentoDto {
   @ApiProperty({ example: 'NR-35 Trabalho em Altura' })
   @IsNotEmpty() @IsString()
-  nome: string;
+  nome!: string;
 
   @ApiPropertyOptional()
   @IsOptional() @IsString()
@@ -13,15 +13,15 @@ export class CreateTreinamentoDto {
 
   @ApiProperty({ enum: TipoTreinamento })
   @IsEnum(TipoTreinamento)
-  tipo: TipoTreinamento;
+  tipo!: TipoTreinamento;
 
   @ApiProperty({ enum: ModalidadeTreinamento })
   @IsEnum(ModalidadeTreinamento)
-  modalidade: ModalidadeTreinamento;
+  modalidade!: ModalidadeTreinamento;
 
   @ApiProperty({ example: 8 })
   @IsInt() @Min(1)
-  cargaHoraria: number;
+  cargaHoraria!: number;
 
   @ApiPropertyOptional({ example: 'NR-35' })
   @IsOptional() @IsString()

@@ -15,35 +15,35 @@ export enum CategoriaEPI {
 @Entity({ name: 'tb_epi' })
 export class Epi {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ length: 255 })
-  nome: string;
+  nome!: string;
 
   @Column({ type: 'enum', enum: CategoriaEPI })
-  categoria: CategoriaEPI;
+  categoria!: CategoriaEPI;
 
   @Column({ length: 50 })
-  numeroCa: string;
+  numeroCa!: string;
 
   @Column({ type: 'date' })
-  validadeCa: Date;
+  validadeCa!: Date;
 
   @Column({ length: 255 })
-  fabricante: string;
+  fabricante!: string;
 
   @Column({ length: 500, nullable: true })
-  descricao: string;
+  descricao!: string;
 
   @Column({ default: 0 })
-  estoqueAtual: number;
+  estoqueAtual!: number;
 
   @Column({ default: 5 })
-  estoqueMinimo: number;
+  estoqueMinimo!: number;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @UpdateDateColumn()
-  atualizadoEm: Date;
+  atualizadoEm!: Date;
 }

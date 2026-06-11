@@ -17,27 +17,27 @@ export enum FormaEleicaoCIPA {
 @Entity({ name: 'tb_cipa' })
 export class Cipa {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ type: 'enum', enum: CargosCIPA })
-  cargo: CargosCIPA;
+  cargo!: CargosCIPA;
 
   @Column({ type: 'enum', enum: FormaEleicaoCIPA })
-  formaEleicao: FormaEleicaoCIPA;
+  formaEleicao!: FormaEleicaoCIPA;
 
   @Column({ type: 'date' })
-  dataPosse: Date;
+  dataPosse!: Date;
 
   @Column({ type: 'date' })
-  dataFimMandato: Date;
+  dataFimMandato!: Date;
 
   @Column({ default: true })
-  ativo: boolean;
+  ativo!: boolean;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @ManyToOne(() => Funcionario)
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 }

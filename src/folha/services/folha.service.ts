@@ -33,49 +33,82 @@ export class FolhaService {
   }
 
   async calcular(dto: CalcularFolhaDto): Promise<FolhaPagamento> {
+    console.log('[FolhaService] DTO recebido:', JSON.stringify(dto, null, 2));
+
+    // Verificar se já existe folha para este período
     const jaExiste = await this.repo.findOne({
       where: { funcionario: { id: dto.funcionarioId }, mes: dto.mes, ano: dto.ano },
     });
-    if (jaExiste) throw new HttpException('Folha já calculada para este período', HttpStatus.CONFLICT);
+    if (jaExiste) {
+      throw new HttpException('Folha já calculada para este período', HttpStatus.CONFLICT);
+    }
 
-    const valorHora       = 0; // será calculado pelo ponto em integração futura
-    const horasExtrasVal  = (dto.horasExtras ?? 0) * valorHora * 1.5;
-    const descontoFaltas  = (dto.faltas ?? 0) * valorHora * 8;
-    const salarioBruto    = dto.adicionalInsalubridade || dto.adicionalPericulosidade
-      ? (dto.adicionalInsalubridade ?? 0) + (dto.adicionalPericulosidade ?? 0)
-      : 0;
-
-    // Busca salário do funcionário via relação
+    // Buscar funcionário
     const funcionario = await this.repo.manager.findOne('tb_funcionario' as any, {
       where: { id: dto.funcionarioId },
     }) as any;
 
-    const salarioBase    = funcionario?.salarioBase ?? 0;
-    const bruto          = salarioBase + horasExtrasVal + (dto.outrosAcrescimos ?? 0) + (dto.adicionalInsalubridade ?? 0) + (dto.adicionalPericulosidade ?? 0);
-    const descontoINSS   = this.inssService.calcular(bruto);
-    const baseIRRF       = bruto - descontoINSS;
-    const descontoIRRF   = this.irrfService.calcular(baseIRRF);
-    const liquido        = bruto - descontoINSS - descontoIRRF - descontoFaltas - (dto.outrosDescontos ?? 0);
-    const fgts           = parseFloat((bruto * 0.08).toFixed(2));
+    if (!funcionario) {
+      throw new HttpException('Funcionário não encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    const salarioBase = funcionario?.salarioBase ?? 0;
+    
+    if (salarioBase <= 0) {
+      throw new HttpException('Funcionário sem salário base cadastrado', HttpStatus.BAD_REQUEST);
+    }
+
+    // 🔧 CORREÇÃO: Calcular valor da hora (220 horas mensais - padrão CLT)
+    const valorHora = salarioBase / 220;
+    
+    // 🔧 Cálculos
+    const horasExtrasVal = (dto.horasExtras ?? 0) * valorHora * 1.5;
+    const descontoFaltas = (dto.faltas ?? 0) * valorHora * 8;
+    
+    // 🔧 Salário bruto
+    const bruto = salarioBase 
+      + horasExtrasVal 
+      + (dto.outrosAcrescimos ?? 0) 
+      + (dto.adicionalInsalubridade ?? 0) 
+      + (dto.adicionalPericulosidade ?? 0);
+    
+    // 🔧 Calcular INSS
+    const descontoINSS = this.inssService.calcular(bruto);
+    
+    // 🔧 Calcular IRRF
+    const baseIRRF = bruto - descontoINSS;
+    const descontoIRRF = this.irrfService.calcular(baseIRRF);
+    
+    // 🔧 Salário líquido
+    const liquido = bruto 
+      - descontoINSS 
+      - descontoIRRF 
+      - descontoFaltas 
+      - (dto.outrosDescontos ?? 0);
+    
+    // 🔧 FGTS (8% do salário bruto)
+    const fgts = parseFloat((bruto * 0.08).toFixed(2));
 
     const folha = this.repo.create({
-      mes:                     dto.mes,
-      ano:                     dto.ano,
-      salarioBruto:            parseFloat(bruto.toFixed(2)),
-      descontoINSS,
-      descontoIRRF,
-      descontoFaltas:          parseFloat(descontoFaltas.toFixed(2)),
-      adicionalHorasExtras:    parseFloat(horasExtrasVal.toFixed(2)),
-      adicionalInsalubridade:  dto.adicionalInsalubridade ?? 0,
+      mes: dto.mes,
+      ano: dto.ano,
+      salarioBruto: parseFloat(bruto.toFixed(2)),
+      descontoINSS: parseFloat(descontoINSS.toFixed(2)),
+      descontoIRRF: parseFloat(descontoIRRF.toFixed(2)),
+      descontoFaltas: parseFloat(descontoFaltas.toFixed(2)),
+      adicionalHorasExtras: parseFloat(horasExtrasVal.toFixed(2)),
+      adicionalInsalubridade: dto.adicionalInsalubridade ?? 0,
       adicionalPericulosidade: dto.adicionalPericulosidade ?? 0,
-      outrosDescontos:         dto.outrosDescontos ?? 0,
-      outrosAcrescimos:        dto.outrosAcrescimos ?? 0,
-      salarioLiquido:          parseFloat(liquido.toFixed(2)),
+      outrosDescontos: dto.outrosDescontos ?? 0,
+      outrosAcrescimos: dto.outrosAcrescimos ?? 0,
+      salarioLiquido: parseFloat(liquido.toFixed(2)),
       fgts,
-      observacao:              dto.observacao,
-      funcionario:             { id: dto.funcionarioId } as any,
+      observacao: dto.observacao,
+      funcionario: { id: dto.funcionarioId } as any,
     });
 
+    console.log('[FolhaService] Folha criada:', folha);
+    
     return this.repo.save(folha);
   }
 

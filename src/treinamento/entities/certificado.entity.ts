@@ -4,24 +4,24 @@ import { Inscricao } from './inscricao.entity';
 @Entity({ name: 'tb_certificado' })
 export class Certificado {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ length: 100, unique: true })
-  codigo: string;
+  codigo!: string;
 
   @Column({ type: 'date' })
-  dataEmissao: Date;
+  dataEmissao!: Date;
 
   @Column({ type: 'date', nullable: true })
-  dataVencimento: Date;
+  dataVencimento!: Date;
 
   @Column({ length: 500, nullable: true })
-  urlDocumento: string;
+  urlDocumento!: string;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @OneToOne(() => Inscricao)
   @JoinColumn({ name: 'inscricao_id' })
-  inscricao: Inscricao;
+  inscricao!: Inscricao;
 }

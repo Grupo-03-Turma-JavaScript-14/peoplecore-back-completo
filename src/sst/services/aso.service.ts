@@ -48,21 +48,36 @@ export class AsoService {
   }
 
   async create(dto: CreateAsoDto): Promise<Aso> {
-    // ✅ undefined em vez de null — TypeORM não aceita null em DeepPartial<Date>
     const aso = this.repo.create({
-      tipo:             dto.tipo,
-      resultado:        dto.resultado,
+      tipo:              dto.tipo,
+      resultado:         dto.resultado,
       medicoResponsavel: dto.medicoResponsavel,
-      crm:              dto.crm,
-      observacao:       dto.observacao,
-      restricoes:       dto.restricoes,
-      urlDocumento:     dto.urlDocumento,
-      dataExame:        new Date(dto.dataExame),
-      dataProximoExame: dto.dataProximoExame
-        ? new Date(dto.dataProximoExame)
-        : undefined,                           // ✅ undefined, nunca null
-      funcionario:      { id: dto.funcionarioId } as any,
+      crm:               dto.crm,
+      observacao:        dto.observacao,
+      restricoes:        dto.restricoes,
+      urlDocumento:      dto.urlDocumento,
+      dataExame:         new Date(dto.dataExame),
+      dataProximoExame:  dto.dataProximoExame ? new Date(dto.dataProximoExame) : undefined,
+      funcionario:       { id: dto.funcionarioId } as any,
     });
+    return this.repo.save(aso);
+  }
+
+  // ✅ ADICIONAR ESTE MÉTODO
+  async update(id: number, dto: CreateAsoDto): Promise<Aso> {
+    const aso = await this.findById(id);
+    
+    if (dto.tipo) aso.tipo = dto.tipo;
+    if (dto.resultado) aso.resultado = dto.resultado;
+    if (dto.dataExame) aso.dataExame = new Date(dto.dataExame);
+    if (dto.dataProximoExame) aso.dataProximoExame = new Date(dto.dataProximoExame);
+    if (dto.medicoResponsavel) aso.medicoResponsavel = dto.medicoResponsavel;
+    if (dto.crm) aso.crm = dto.crm;
+    if (dto.observacao) aso.observacao = dto.observacao;
+    if (dto.restricoes) aso.restricoes = dto.restricoes;
+    if (dto.urlDocumento) aso.urlDocumento = dto.urlDocumento;
+    if (dto.funcionarioId) aso.funcionario = { id: dto.funcionarioId } as any;
+    
     return this.repo.save(aso);
   }
 

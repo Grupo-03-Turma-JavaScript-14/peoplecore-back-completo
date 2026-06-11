@@ -1,31 +1,32 @@
-import { Module } from "@nestjs/common";
-import { JwtModule } from "@nestjs/jwt";
-import { PassportModule } from "@nestjs/passport";
-import { UsuarioModule } from "../usuario/usuario.module";
-import { AutenticacaoController } from "./controllers/autenticacao.controller";
-import { JwtStrategy } from "./estrategias/jwt.strategy";
-import { AutenticacaoService } from "./services/autenticacao.service";
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AutenticacaoService } from './services/autenticacao.service';
+import { AutenticacaoController } from './controllers/autenticacao.controller';
+import { JwtStrategy } from './estrategias/jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UsuarioModule } from '../usuario/usuario.module';
 
 @Module({
-    imports: [
-        UsuarioModule,
-        PassportModule,
-        JwtModule.register({
-            secret: process.env.JWT_SECRET || 'workly_peoplecore_secret',
-            signOptions: {
-                expiresIn: '2h',
-            },
-        }),
-    ],
-    controllers: [
-        AutenticacaoController
-    ],
-    providers: [
-        AutenticacaoService,
-        JwtStrategy
-    ],
-    exports: [
-        AutenticacaoService
-    ]
+  imports: [
+    PassportModule,
+    UsuarioModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        console.log('[JwtModule] Secret carregado:', secret ? 'SIM' : 'NÃO');
+        return {
+          secret: secret,
+          signOptions: { expiresIn: '7d' },
+        };
+      },
+      inject: [ConfigService],
+    }),
+  ],
+  providers: [AutenticacaoService, JwtStrategy, JwtAuthGuard],
+  controllers: [AutenticacaoController],
+  exports: [AutenticacaoService, JwtAuthGuard, JwtStrategy],
 })
-export class AutenticacaoModule { }
+export class AutenticacaoModule {}

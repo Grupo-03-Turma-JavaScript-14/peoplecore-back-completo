@@ -5,15 +5,15 @@ import { TipoASO, ResultadoASO } from '../entities/aso.entity';
 export class CreateAsoDto {
   @ApiProperty({ enum: TipoASO })
   @IsEnum(TipoASO)
-  tipo: TipoASO;
+  tipo!: TipoASO;
 
   @ApiProperty({ enum: ResultadoASO })
   @IsEnum(ResultadoASO)
-  resultado: ResultadoASO;
+  resultado!: ResultadoASO;
 
   @ApiProperty({ example: '2025-06-01' })
   @IsDateString()
-  dataExame: string;
+  dataExame!: string;
 
   @ApiPropertyOptional({ example: '2026-06-01' })
   @IsOptional() @IsDateString()
@@ -21,7 +21,7 @@ export class CreateAsoDto {
 
   @ApiProperty({ example: 'Dr. Ana Médica' })
   @IsString()
-  medicoResponsavel: string;
+  medicoResponsavel!: string;
 
   @ApiPropertyOptional({ example: '54321/SP' })
   @IsOptional() @IsString()
@@ -41,5 +41,5 @@ export class CreateAsoDto {
 
   @ApiProperty({ example: 1 })
   @IsNumber()
-  funcionarioId: number;
+  funcionarioId!: number;
 }

@@ -30,20 +30,23 @@ export class AutenticacaoService {
             throw new HttpException("Senha inválida!", HttpStatus.UNAUTHORIZED);
         }
 
+        // ✅ PAYLOAD COM A ROLE
         const payload = {
             sub: usuario.id,
-            usuario: usuario.usuario
+            usuario: usuario.usuario,
+            role: usuario.role  // ← PEGA A ROLE DO BANCO
         };
 
         const token = this.jwtService.sign(payload);
 
+        // ✅ RETORNA COM A ROLE
         return {
             id: usuario.id,
             nome: usuario.nome,
             usuario: usuario.usuario,
             foto: usuario.foto,
+            role: usuario.role,  // ← RETORNA A ROLE
             token: token
         };
     }
-
 }

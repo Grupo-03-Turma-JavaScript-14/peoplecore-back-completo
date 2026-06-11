@@ -9,18 +9,18 @@ export enum TipoRubrica {
 @Entity({ name: 'tb_rubrica' })
 export class Rubrica {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column({ length: 255 })
-  descricao: string;
+  descricao!: string;
 
   @Column({ type: 'enum', enum: TipoRubrica })
-  tipo: TipoRubrica;
+  tipo!: TipoRubrica;
 
   @Column('float')
-  valor: number;
+  valor!: number;
 
   @ManyToOne(() => FolhaPagamento, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'folha_id' })
-  folha: FolhaPagamento;
+  folha!: FolhaPagamento;
 }

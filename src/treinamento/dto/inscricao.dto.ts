@@ -5,15 +5,15 @@ import { StatusInscricao } from '../entities/inscricao.entity';
 export class InscricaoDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
-  funcionarioId: number;
+  funcionarioId!: number;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
-  treinamentoId: number;
+  treinamentoId!: number;
 
   @ApiProperty({ example: '2025-07-01' })
   @IsDateString()
-  dataInicio: string;
+  dataInicio!: string;
 
   @ApiPropertyOptional({ enum: StatusInscricao })
   @IsOptional() @IsEnum(StatusInscricao)

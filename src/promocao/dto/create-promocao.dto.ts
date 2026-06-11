@@ -5,27 +5,27 @@ import { TipoMovimentacao } from '../entities/promocao.entity';
 export class CreatePromocaoDto {
   @ApiProperty({ enum: TipoMovimentacao })
   @IsEnum(TipoMovimentacao)
-  tipo: TipoMovimentacao;
+  tipo!: TipoMovimentacao;
 
   @ApiProperty({ example: 'Desenvolvedor Junior' })
   @IsNotEmpty()
   @IsString()
-  cargoAnterior: string;
+  cargoAnterior!: string;
 
   @ApiProperty({ example: 'Desenvolvedor Pleno' })
   @IsNotEmpty()
   @IsString()
-  cargoNovo: string;
+  cargoNovo!: string;
 
   @ApiProperty({ example: 3000 })
   @IsNumber()
   @IsPositive()
-  salarioAnterior: number;
+  salarioAnterior!: number;
 
   @ApiProperty({ example: 4500 })
   @IsNumber()
   @IsPositive()
-  salarioNovo: number;
+  salarioNovo!: number;
 
   @ApiPropertyOptional({ example: 'Excelente desempenho no último ciclo' })
   @IsOptional()
@@ -34,5 +34,5 @@ export class CreatePromocaoDto {
 
   @ApiProperty({ example: 1 })
   @IsNumber()
-  funcionarioId: number;
+  funcionarioId!: number;
 }

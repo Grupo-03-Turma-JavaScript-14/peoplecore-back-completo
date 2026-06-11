@@ -5,23 +5,23 @@ import { CategoriaEPI } from '../entities/epi.entity';
 export class CreateEpiDto {
   @ApiProperty({ example: 'Capacete de Segurança' })
   @IsString()
-  nome: string;
+  nome!: string;
 
   @ApiProperty({ enum: CategoriaEPI })
   @IsEnum(CategoriaEPI)
-  categoria: CategoriaEPI;
+  categoria!: CategoriaEPI;
 
   @ApiProperty({ example: '12345' })
   @IsString()
-  numeroCa: string;
+  numeroCa!: string;
 
   @ApiProperty({ example: '2027-12-31' })
   @IsDateString()
-  validadeCa: string;
+  validadeCa!: string;
 
   @ApiProperty({ example: '3M' })
   @IsString()
-  fabricante: string;
+  fabricante!: string;
 
   @ApiPropertyOptional()
   @IsOptional() @IsString()

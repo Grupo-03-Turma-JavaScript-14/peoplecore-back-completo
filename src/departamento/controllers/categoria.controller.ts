@@ -40,12 +40,16 @@ export class CategoriaController {
     return this.categoriaService.create(categoria);
   }
 
+  // 🔥 CORREÇÃO: Adicionado /:id na URL
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  @Put()
+  @Put('/:id')
   @HttpCode(HttpStatus.OK)
-  update(@Body() categoria: Categoria): Promise<Categoria> {
-    return this.categoriaService.update(categoria);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() categoria: Categoria
+  ): Promise<Categoria> {
+    return this.categoriaService.update(id, categoria);
   }
 
   @ApiBearerAuth()
@@ -55,5 +59,4 @@ export class CategoriaController {
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.categoriaService.delete(id);
   }
-
 }

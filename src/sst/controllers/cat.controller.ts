@@ -1,43 +1,48 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles, Role } from '../../common/decorators/roles.decorator';
+// cat.controller.ts
+import { Controller, Get, Post, Put, Delete, Body, Param, HttpStatus, HttpException } from '@nestjs/common';
 import { CatService } from '../services/cat.service';
 import { CreateCatDto } from '../dto/create-cat.dto';
 
-@ApiTags('SST — CAT Acidentes')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('sst/cat')
 export class CatController {
   constructor(private readonly service: CatService) {}
 
   @Get()
-  findAll() { return this.service.findAll(); }
-
-  @Get('funcionario/:id')
-  findByFuncionario(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findByFuncionario(id);
+  async findAll() {
+    return this.service.findAll();
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) { return this.service.findById(id); }
+  async findById(@Param('id') id: number) {
+    return this.service.findById(id);
+  }
+
+  @Get('funcionario/:funcionarioId')
+  async findByFuncionario(@Param('funcionarioId') funcionarioId: number) {
+    return this.service.findByFuncionario(funcionarioId);
+  }
 
   @Post()
-  @Roles(Role.ADMIN, Role.RH)
-  @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateCatDto) { return this.service.create(dto); }
+  async create(@Body() dto: CreateCatDto) {
+    return this.service.create(dto);
+  }
 
-  @Put(':id/esocial')
-  @Roles(Role.ADMIN, Role.RH)
-  marcarEnviado(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('protocolo') protocolo: string,
-  ) { return this.service.marcarEnviadoEsocial(id, protocolo); }
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() dto: CreateCatDto) {
+    return this.service.update(id, dto);
+  }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number) { return this.service.delete(id); }
+  async delete(@Param('id') id: number) {
+    await this.service.delete(id);
+    return { message: 'CAT removida com sucesso' };
+  }
+
+  @Post(':id/enviar-esocial')
+  async enviarEsocial(@Param('id') id: number, @Body('protocolo') protocolo: string) {
+    if (!protocolo) {
+      throw new HttpException('Protocolo é obrigatório', HttpStatus.BAD_REQUEST);
+    }
+    return this.service.marcarEnviadoEsocial(id, protocolo);
+  }
 }

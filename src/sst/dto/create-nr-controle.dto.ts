@@ -5,11 +5,11 @@ import { StatusNR } from '../entities/nr-controle.entity';
 export class CreateNrControleDto {
   @ApiProperty({ example: 'NR-5' })
   @IsString()
-  numero: string;
+  numero!: string;
 
   @ApiProperty({ example: 'CIPA' })
   @IsString()
-  nome: string;
+  nome!: string;
 
   @ApiPropertyOptional({ enum: StatusNR })
   @IsOptional() @IsEnum(StatusNR)

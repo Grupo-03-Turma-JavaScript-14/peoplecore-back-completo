@@ -4,19 +4,19 @@ import { IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validat
 export class EntregaEpiDto {
   @ApiProperty({ example: 1 })
   @IsNumber()
-  funcionarioId: number;
+  funcionarioId!: number;
 
   @ApiProperty({ example: 1 })
   @IsNumber()
-  epiId: number;
+  epiId!: number;
 
   @ApiProperty({ example: 1 })
   @IsNumber() @Min(1)
-  quantidade: number;
+  quantidade!: number;
 
   @ApiProperty({ example: '2025-06-01' })
   @IsDateString()
-  dataEntrega: string;
+  dataEntrega!: string;
 
   @ApiPropertyOptional({ example: '2025-12-01' })
   @IsOptional() @IsDateString()

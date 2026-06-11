@@ -10,57 +10,57 @@ export enum StatusFolha {
 @Entity({ name: 'tb_folha_pagamento' })
 export class FolhaPagamento {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number;
 
   @Column()
-  mes: number;
+  mes!: number;
 
   @Column()
-  ano: number;
+  ano!: number;
 
   @Column('float')
-  salarioBruto: number;
+  salarioBruto!: number;
 
   @Column('float')
-  descontoINSS: number;
+  descontoINSS!: number;
 
   @Column('float')
-  descontoIRRF: number;
+  descontoIRRF!: number;
 
   @Column('float', { default: 0 })
-  descontoFaltas: number;
+  descontoFaltas!: number;
 
   @Column('float', { default: 0 })
-  adicionalHorasExtras: number;
+  adicionalHorasExtras!: number;
 
   @Column('float', { default: 0 })
-  adicionalInsalubridade: number;
+  adicionalInsalubridade!: number;
 
   @Column('float', { default: 0 })
-  adicionalPericulosidade: number;
+  adicionalPericulosidade!: number;
 
   @Column('float', { default: 0 })
-  outrosDescontos: number;
+  outrosDescontos!: number;
 
   @Column('float', { default: 0 })
-  outrosAcrescimos: number;
+  outrosAcrescimos!: number;
 
   @Column('float')
-  salarioLiquido: number;
+  salarioLiquido!: number;
 
   @Column('float')
-  fgts: number;
+  fgts!: number;
 
   @Column({ type: 'enum', enum: StatusFolha, default: StatusFolha.RASCUNHO })
-  status: StatusFolha;
+  status!: StatusFolha;
 
   @Column({ nullable: true })
-  observacao: string;
+  observacao!: string;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @ManyToOne(() => Funcionario)
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 }

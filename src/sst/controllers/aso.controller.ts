@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -11,35 +11,41 @@ import { CreateAsoDto } from '../dto/create-aso.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('sst/asos')
 export class AsoController {
-  constructor(private readonly service: AsoService) {}
+  constructor(private readonly asoService: AsoService) {}
 
   @Get()
-  findAll() { return this.service.findAll(); }
+  findAll() { return this.asoService.findAll(); }
 
   @Get('vencidos')
-  findVencidos() { return this.service.findVencidos(); }
+  findVencidos() { return this.asoService.findVencidos(); }
 
   @Get('proximos-vencer')
   @ApiQuery({ name: 'dias', required: false, example: 30 })
   findProximosVencer(@Query('dias') dias?: number) {
-    return this.service.findProximosVencer(dias ? +dias : 30);
+    return this.asoService.findProximosVencer(dias ? +dias : 30);
   }
 
   @Get('funcionario/:id')
   findByFuncionario(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findByFuncionario(id);
+    return this.asoService.findByFuncionario(id);
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) { return this.service.findById(id); }
+  findById(@Param('id', ParseIntPipe) id: number) { return this.asoService.findById(id); }
 
   @Post()
   @Roles(Role.ADMIN, Role.RH)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateAsoDto) { return this.service.create(dto); }
+  create(@Body() dto: CreateAsoDto) { return this.asoService.create(dto); }
+
+  @Put(':id')
+  @Roles(Role.ADMIN, Role.RH)
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateAsoDto) {
+    return this.asoService.update(id, dto);
+  }
 
   @Delete(':id')
   @Roles(Role.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number) { return this.service.delete(id); }
+  delete(@Param('id', ParseIntPipe) id: number) { return this.asoService.delete(id); }
 }

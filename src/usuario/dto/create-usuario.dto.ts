@@ -17,12 +17,13 @@ export class CreateUsuarioDto {
   @MinLength(8)
   senha!: string;
 
-  @ApiPropertyOptional({ example: 'https://foto.url/foto.jpg' })
+  // Torne TODOS os campos opcionais
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   foto?: string;
 
-  @ApiPropertyOptional({ example: 'ADMIN', enum: ['ADMIN','RH','GESTOR','COLABORADOR'] })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   role?: string;
