@@ -1,20 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 describe('AppController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
-    const app: TestingModule = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
-      providers: [AppService],
     }).compile();
 
-    appController = app.get<AppController>(AppController);
+    appController = module.get<AppController>(AppController);
   });
 
   it('should be defined', () => {
     expect(appController).toBeDefined();
+  });
+
+  it('should redirect to swagger', () => {
+    const result = appController.redirect();
+    expect(result).toEqual({
+      url: '/swagger',
+      statusCode: 302,
+    });
   });
 });

@@ -61,18 +61,24 @@ export class EpiService {
     epi.estoqueAtual -= dto.quantidade;
     await this.epiRepo.save(epi);
 
-    // ✅ undefined em vez de null nos campos de data opcionais
     const entrega = this.entregaRepo.create({
       quantidade:       dto.quantidade,
       observacao:       dto.observacao,
       dataEntrega:      new Date(dto.dataEntrega),
       dataProximaTroca: dto.dataProximaTroca
         ? new Date(dto.dataProximaTroca)
-        : undefined,                           // ✅ undefined, nunca null
+        : undefined,
       funcionario:      { id: dto.funcionarioId } as any,
       epi:              { id: dto.epiId } as any,
     });
     return this.entregaRepo.save(entrega);
+  }
+
+  // Listagem de todas as entregas (corrigido para usar entregaRepo)
+  async findAllEntregas(): Promise<EntregaEpi[]> {
+    return await this.entregaRepo.find({
+      relations: ['funcionario', 'epi'],
+    });
   }
 
   async findEntregasByFuncionario(funcionarioId: number): Promise<EntregaEpi[]> {

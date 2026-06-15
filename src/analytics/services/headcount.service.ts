@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Funcionario } from '../../funcionario/entities/funcionario.entity';
-import { Contrato, StatusContrato } from '../../contrato/entities/contrato.entity';
+import { ContratoTrabalho, StatusContratoTrabalho } from '../../DepartamentoPessoal/contratotrabalhista/entities/contrato-trabalho.entity';
 
 // Interfaces locais para manter o Back-end desacoplado do Front-end
 export interface HeadcountDep {
@@ -23,13 +23,13 @@ export class HeadcountService {
     @InjectRepository(Funcionario)
     private readonly funcRepo: Repository<Funcionario>,
 
-    @InjectRepository(Contrato)
-    private readonly contratoRepo: Repository<Contrato>,
+    @InjectRepository(ContratoTrabalho)  // ← corrigido
+    private readonly contratoRepo: Repository<ContratoTrabalho>,
   ) {}
 
   async headcountTotal(): Promise<number> {
     return this.contratoRepo.count({
-      where: { status: StatusContrato.ATIVO },
+      where: { status: StatusContratoTrabalho.ATIVO },  // ← corrigido
     });
   }
 

@@ -1,8 +1,26 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles, Role } from '../../common/decorators/roles.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+
+import { CompanyRole } from '../../common/enums/company-role.enum';
+
 import { AsoService } from '../services/aso.service';
 import { CreateAsoDto } from '../dto/create-aso.dto';
 
@@ -14,10 +32,14 @@ export class AsoController {
   constructor(private readonly asoService: AsoService) {}
 
   @Get()
-  findAll() { return this.asoService.findAll(); }
+  findAll() {
+    return this.asoService.findAll();
+  }
 
   @Get('vencidos')
-  findVencidos() { return this.asoService.findVencidos(); }
+  findVencidos() {
+    return this.asoService.findVencidos();
+  }
 
   @Get('proximos-vencer')
   @ApiQuery({ name: 'dias', required: false, example: 30 })
@@ -31,21 +53,31 @@ export class AsoController {
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) { return this.asoService.findById(id); }
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.asoService.findById(id);
+  }
 
+  // 🏢 regras por empresa (CompanyRole)
   @Post()
-  @Roles(Role.ADMIN, Role.RH)
+  @Roles(CompanyRole.ADMIN, CompanyRole.RH)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateAsoDto) { return this.asoService.create(dto); }
+  create(@Body() dto: CreateAsoDto) {
+    return this.asoService.create(dto);
+  }
 
   @Put(':id')
-  @Roles(Role.ADMIN, Role.RH)
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateAsoDto) {
+  @Roles(CompanyRole.ADMIN, CompanyRole.RH)
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: CreateAsoDto,
+  ) {
     return this.asoService.update(id, dto);
   }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
+  @Roles(CompanyRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number) { return this.asoService.delete(id); }
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.asoService.delete(id);
+  }
 }

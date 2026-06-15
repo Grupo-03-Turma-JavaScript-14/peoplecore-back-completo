@@ -1,39 +1,50 @@
-import { IsEmail, IsNotEmpty, MinLength } from "class-validator";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Funcionario } from "../../funcionario/entities/funcionario.entity";
-import { Role } from '../../common/enums /role.enum';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+} from 'typeorm';
 
-@Entity({ name: 'tb_usuario' })
+import { Empresa } from '../../empresa/entities/empresa.entity';
+import { GlobalRole } from '../../common/enums/global-role.enum';
+import { CompanyRole } from '../../common/enums/company-role.enum';
+
+@Entity('tb_usuario')
 export class Usuario {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @PrimaryGeneratedColumn()
-    id!: number;
+  @Column()
+  nome!: string;
 
-    @IsNotEmpty()
-    @Column({ length: 255, nullable: false })
-    nome!: string;
+  @Column()
+  usuario!: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    @Column({ length: 100, nullable: false })
-    usuario!: string;
+  @Column()
+  senha!: string;
 
-    @Column({ length: 255, nullable: true })
-    foto!: string;
+  @Column({ default: true })
+  mustChangePassword!: boolean;
 
-    @IsNotEmpty()
-    @MinLength(8)
-    @Column({ length: 60, nullable: false })
-    senha!: string;
+  // 🌍 ROLE GLOBAL (plataforma SaaS)
+  @Column({
+    type: 'enum',
+    enum: GlobalRole,
+    nullable: true,
+  })
+  globalRole?: GlobalRole;
 
-    @Column({
-        type: 'enum',
-        enum: Role,
-        default: Role.COLABORADOR
-    })
-    role!: Role;
+  // 🏢 ROLE DA EMPRESA
+  @Column({
+    type: 'enum',
+    enum: CompanyRole,
+    nullable: true,
+  })
+  companyRole?: CompanyRole;
 
+  @Column({ nullable: true })
+  empresaId?: number;
 
-    @OneToMany(() => Funcionario, (funcionario) => funcionario.usuario)
-    funcionarios!: Funcionario[];
+  @ManyToOne(() => Empresa)
+  empresa?: Empresa;
 }

@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty, IsNumber, IsOptional,
-  IsPositive, IsString, MaxLength,
+  IsPositive, IsString, MaxLength, IsArray, IsInt,
 } from 'class-validator';
 
 export class CreateFuncionarioDto {
@@ -11,127 +11,95 @@ export class CreateFuncionarioDto {
   @MaxLength(255)
   nome!: string;
 
-  @ApiProperty({ example: 'Desenvolvedora Backend' })
-  @IsNotEmpty()
+  // Campos de Relacionamento (ESSENCIAL PARA A CORREÇÃO)
+  @ApiPropertyOptional({ example: 2 })
+  @IsOptional()
+  @IsNumber()
+  departamentoId?: number;
+
+  @ApiPropertyOptional({ example: 5 })
+  @IsOptional()
+  @IsNumber()
+  funcaoId?: number;
+
+  @ApiPropertyOptional({ example: 1, description: 'ID da admissão vinculada' })
+  @IsOptional()
+  @IsInt()
+  admissaoId?: number;
+
+  @ApiPropertyOptional({ example: 'Desenvolvedora' })
+  @IsOptional()
   @IsString()
-  @MaxLength(255)
-  cargo!: string;
+  cargo?: string;
 
-  @ApiProperty({ example: 160 })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ example: 160 })
+  @IsOptional()
   @IsNumber()
-  @IsPositive()
-  horasTrabalhadas!: number;
+  horasTrabalhadas?: number;
 
-  @ApiProperty({ example: 25.50 })
-  @IsNotEmpty()
+  @ApiPropertyOptional({ example: 25.50 })
+  @IsOptional()
   @IsNumber()
-  @IsPositive()
-  salarioBase!: number;
+  salarioBase?: number;
 
   @ApiPropertyOptional({ example: 1 })
   @IsOptional()
   @IsNumber()
   usuarioId?: number;
 
-  @ApiPropertyOptional({ example: 2 })
+  @ApiPropertyOptional({ example: 1 })
   @IsOptional()
   @IsNumber()
   categoriaId?: number;
 
-  // ========== NOVOS CAMPOS OPCIONAIS ==========
-  @ApiPropertyOptional({ example: '12345' })
+  @ApiPropertyOptional({ example: 1 })
   @IsOptional()
-  @IsString()
-  matricula?: string;
+  @IsNumber()
+  empresaId?: number;
 
-  @ApiPropertyOptional({ example: '123.456.789-00' })
-  @IsOptional()
-  @IsString()
-  cpf?: string;
+  // ========== ABA 1: DADOS PESSOAIS ==========
+  @IsOptional() @IsString() matricula?: string;
+  @IsOptional() @IsString() cpf?: string;
+  @IsOptional() @IsString() rg?: string;
+  @IsOptional() @IsString() orgaoEmissor?: string;
+  @IsOptional() @IsString() dataEmissaoRg?: string;
+  @IsOptional() @IsString() dataNascimento?: string;
+  @IsOptional() @IsString() estadoCivil?: string;
+  @IsOptional() @IsString() nacionalidade?: string;
+  @IsOptional() @IsString() naturalidade?: string;
 
-  @ApiPropertyOptional({ example: '12.345.678-9' })
-  @IsOptional()
-  @IsString()
-  rg?: string;
+  // ========== ABA 2: ENDEREÇO E CONTATO ==========
+  @IsOptional() @IsString() cep?: string;
+  @IsOptional() @IsString() logradouro?: string;
+  @IsOptional() @IsString() numero?: string;
+  @IsOptional() @IsString() complemento?: string;
+  @IsOptional() @IsString() bairro?: string;
+  @IsOptional() @IsString() cidade?: string;
+  @IsOptional() @IsString() uf?: string;
+  @IsOptional() @IsString() telefone?: string;
+  @IsOptional() @IsString() email?: string;
 
-  @ApiPropertyOptional({ example: '1990-01-01' })
-  @IsOptional()
-  @IsString()
-  dataNascimento?: string;
+  // ========== ABA 3: DADOS TRABALHISTAS ==========
+  @IsOptional() @IsString() dataAdmissao?: string;
+  @IsOptional() @IsString() tipoContrato?: string;
+  @IsOptional() @IsString() banco?: string;
+  @IsOptional() @IsString() agencia?: string;
+  @IsOptional() @IsString() conta?: string;
+  @IsOptional() @IsString() tipoConta?: string;
 
-  @ApiPropertyOptional({ example: 'Rua Exemplo, 123' })
+  // ========== ABA 4: DADOS SST ==========
+  @IsOptional() @IsString() tamanhoCamisa?: string;
+  @IsOptional() @IsString() tamanhoCalca?: string;
+  @IsOptional() @IsString() tamanhoBota?: string;
+  @IsOptional() @IsString() tamanhoLuva?: string;
+  
+  @ApiPropertyOptional({ example: ['Ruído', 'Calor'] })
   @IsOptional()
-  @IsString()
-  endereco?: string;
+  @IsArray()
+  fatoresRisco?: string[];
 
-  @ApiPropertyOptional({ example: '(11) 99999-9999' })
-  @IsOptional()
-  @IsString()
-  telefone?: string;
-
-  @ApiPropertyOptional({ example: 'usuario@email.com' })
-  @IsOptional()
-  @IsString()
-  email?: string;
-
-  @ApiPropertyOptional({ example: '12345678901' })
-  @IsOptional()
-  @IsString()
-  pis?: string;
-
-  @ApiPropertyOptional({ example: '123456' })
-  @IsOptional()
-  @IsString()
-  ctpsNumero?: string;
-
-  @ApiPropertyOptional({ example: '1234' })
-  @IsOptional()
-  @IsString()
-  ctpsSerie?: string;
-
-  @ApiPropertyOptional({ example: 'SOLTEIRO' })
-  @IsOptional()
-  @IsString()
-  estadoCivil?: string;
-
-  @ApiPropertyOptional({ example: 'Brasileira' })
-  @IsOptional()
-  @IsString()
-  nacionalidade?: string;
-
-  @ApiPropertyOptional({ example: 'São Paulo/SP' })
-  @IsOptional()
-  @IsString()
-  naturalidade?: string;
-
-  @ApiPropertyOptional({ example: '2024-01-01' })
-  @IsOptional()
-  @IsString()
-  dataAdmissao?: string;
-
-  @ApiPropertyOptional({ example: 'CLT' })
-  @IsOptional()
-  @IsString()
-  tipoContrato?: string;
-
-  @ApiPropertyOptional({ example: '001' })
-  @IsOptional()
-  @IsString()
-  banco?: string;
-
-  @ApiPropertyOptional({ example: '1234-5' })
-  @IsOptional()
-  @IsString()
-  agencia?: string;
-
-  @ApiPropertyOptional({ example: '123456-7' })
-  @IsOptional()
-  @IsString()
-  conta?: string;
-
-  @ApiPropertyOptional({ example: 'CORRENTE' })
-  @IsOptional()
-  @IsString()
-  tipoConta?: string;
+  // ========== ABA 5: DOCUMENTOS ADICIONAIS ==========
+  @IsOptional() @IsString() pis?: string;
+  @IsOptional() @IsString() ctpsNumero?: string;
+  @IsOptional() @IsString() ctpsSerie?: string;
 }

@@ -1,8 +1,26 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles, Role } from '../../common/decorators/roles.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+
+import { CompanyRole } from '../../common/enums/company-role.enum';
+
 import { LaudoService } from '../services/laudo.service';
 import { CreateLaudoDto } from '../dto/create-laudo.dto';
 import { StatusLaudo } from '../entities/laudo.entity';
@@ -15,10 +33,14 @@ export class LaudoController {
   constructor(private readonly service: LaudoService) {}
 
   @Get()
-  findAll() { return this.service.findAll(); }
+  findAll() {
+    return this.service.findAll();
+  }
 
   @Get('vencidos')
-  findVencidos() { return this.service.findVencidos(); }
+  findVencidos() {
+    return this.service.findVencidos();
+  }
 
   @Get('proximos-vencer')
   @ApiQuery({ name: 'dias', required: false, example: 30 })
@@ -27,22 +49,31 @@ export class LaudoController {
   }
 
   @Get(':id')
-  findById(@Param('id', ParseIntPipe) id: number) { return this.service.findById(id); }
+  findById(@Param('id', ParseIntPipe) id: number) {
+    return this.service.findById(id);
+  }
 
+  // 🏢 permissões de empresa
   @Post()
-  @Roles(Role.ADMIN, Role.RH)
+  @Roles(CompanyRole.ADMIN, CompanyRole.RH)
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateLaudoDto) { return this.service.create(dto); }
+  create(@Body() dto: CreateLaudoDto) {
+    return this.service.create(dto);
+  }
 
   @Put(':id/status')
-  @Roles(Role.ADMIN, Role.RH)
+  @Roles(CompanyRole.ADMIN, CompanyRole.RH)
   atualizarStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body('status') status: StatusLaudo,
-  ) { return this.service.atualizarStatus(id, status); }
+  ) {
+    return this.service.atualizarStatus(id, status);
+  }
 
   @Delete(':id')
-  @Roles(Role.ADMIN)
+  @Roles(CompanyRole.ADMIN)
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number) { return this.service.delete(id); }
+  delete(@Param('id', ParseIntPipe) id: number) {
+    return this.service.delete(id);
+  }
 }

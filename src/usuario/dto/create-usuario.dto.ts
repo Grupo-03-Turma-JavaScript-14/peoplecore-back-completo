@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUsuarioDto {
   @ApiProperty({ example: 'João Silva' })
@@ -17,7 +23,6 @@ export class CreateUsuarioDto {
   @MinLength(8)
   senha!: string;
 
-  // Torne TODOS os campos opcionais
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

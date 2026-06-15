@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { Funcionario } from '../entities/funcionario.entity';
+import { CreateFuncionarioDto } from '../dto/create-funcionario.dto';
 
 @Injectable()
 export class FuncionarioService {
@@ -11,71 +12,67 @@ export class FuncionarioService {
   ) {}
 
   private calcularSalario(funcionario: Funcionario): Funcionario {
-    funcionario.salarioTotal = funcionario.horasTrabalhadas * funcionario.salarioBase;
+    const horas = funcionario.horasTrabalhadas || 0;
+    const base = funcionario.salarioBase || 0;
+    funcionario.salarioTotal = horas * base;
     return funcionario;
   }
 
   async findAll(): Promise<Funcionario[]> {
-    try {
-      const funcionarios = await this.funcionarioRepository.find({
-        relations: { categoria: true },
-      });
-      return funcionarios.map((f) => this.calcularSalario(f));
-    } catch (error) {
-      console.error('Erro ao listar:', error);
-      throw new HttpException('Erro ao processar a solicitação', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const funcionarios = await this.funcionarioRepository.find({
+      relations: { categoria: true, empresa: true, admissao: true, funcao: true },
+    });
+    return funcionarios.map((f) => this.calcularSalario(f));
   }
 
   async findById(id: number): Promise<Funcionario> {
-    try {
-      const funcionario = await this.funcionarioRepository.findOne({
-        where: { id },
-        relations: { categoria: true },
-      });
-      if (!funcionario) throw new HttpException('Colaborador não encontrado!', HttpStatus.NOT_FOUND);
-      return this.calcularSalario(funcionario);
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.error('Erro ao buscar:', error);
-      throw new HttpException('Erro ao processar a requisição', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    const funcionario = await this.funcionarioRepository.findOne({
+      where: { id },
+      relations: { categoria: true, empresa: true, admissao: true, funcao: true },
+    });
+    if (!funcionario) throw new HttpException('Colaborador não encontrado!', HttpStatus.NOT_FOUND);
+    return this.calcularSalario(funcionario);
   }
 
-  async create(funcionario: Funcionario): Promise<Funcionario> {
+  async create(data: CreateFuncionarioDto): Promise<Funcionario> {
     try {
-      console.log('📝 Dados recebidos para criar:', funcionario);
-      const funcionarioSalvo = await this.funcionarioRepository.save(funcionario);
-      console.log('✅ Funcionário criado:', funcionarioSalvo);
+      // O 'create' aceita o objeto, garantimos que os IDs de relação estejam presentes
+      const novoFuncionario = this.funcionarioRepository.create({
+        ...data,
+        categoriaId: data.departamentoId || data.categoriaId,
+      });
+      
+      const funcionarioSalvo = await this.funcionarioRepository.save(novoFuncionario);
       return this.calcularSalario(funcionarioSalvo);
     } catch (error) {
-      console.error('❌ Erro ao criar:', error);
+      console.error('Erro ao criar colaborador:', error);
       throw new HttpException('Erro ao salvar colaborador', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async update(funcionario: Funcionario): Promise<Funcionario> {
-    try {
-      await this.findById(funcionario.id);
-      console.log('📝 Atualizando funcionário ID:', funcionario.id);
-      const updated = await this.funcionarioRepository.save(funcionario);
-      console.log('✅ Funcionário atualizado:', updated);
-      return this.calcularSalario(updated);
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.error('❌ Erro ao atualizar:', error);
-      throw new HttpException('Erro ao atualizar colaborador', HttpStatus.INTERNAL_SERVER_ERROR);
+  async update(id: number, data: Partial<CreateFuncionarioDto>): Promise<Funcionario> {
+    // 1. Buscamos o colaborador existente. 
+    // O 'save' precisa da instância para realizar o merge corretamente.
+    const funcionario = await this.funcionarioRepository.findOne({ where: { id } });
+    if (!funcionario) throw new HttpException('Colaborador não encontrado!', HttpStatus.NOT_FOUND);
+
+    // 2. Mapeamento seguro: atualizamos os campos da instância recuperada
+    // Se o campo existir no 'data', ele sobrescreve a instância.
+    Object.assign(funcionario, data);
+
+    // 3. Tratamento específico para os IDs que o front envia como 'departamentoId'
+    if (data.departamentoId !== undefined) {
+      funcionario.categoriaId = data.departamentoId;
     }
+
+    // 4. Salvamos a entidade. O TypeORM vai comparar o que mudou e salvar apenas o necessário.
+    const funcionarioAtualizado = await this.funcionarioRepository.save(funcionario);
+    
+    return this.calcularSalario(funcionarioAtualizado);
   }
 
   async delete(id: number): Promise<DeleteResult> {
-    try {
-      await this.findById(id);
-      return await this.funcionarioRepository.delete(id);
-    } catch (error) {
-      if (error instanceof HttpException) throw error;
-      console.error('Erro ao deletar:', error);
-      throw new HttpException('Não é possível excluir este colaborador. Exclua primeiro os registros vinculados (contratos, férias, folhas, etc.)', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    await this.findById(id);
+    return await this.funcionarioRepository.delete(id);
   }
 }

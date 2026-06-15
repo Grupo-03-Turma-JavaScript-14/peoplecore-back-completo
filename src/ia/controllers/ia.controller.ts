@@ -1,58 +1,38 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
-import { IaService, MensagemChat } from '../services/ia.service';
+// src/ia/controllers/ia.controller.ts
+import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { IaService } from '../services/ia.service';  // ← caminho corrigido
+import { ChatRequestDto } from '../dto/chat-request.dto';  // ← caminho corrigido
+import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';  // ← caminho corrigido
 
-class ChatDto {
-  mensagem!:  string;
-  historico?: MensagemChat[];
-  contexto?:  string;
-}
-
-class SstAnaliseDto {
-  dadosEmpresa: any;
-}
-
-class TreinamentoSugestaoDto {
-  cargo!:        string;
-  departamento!: string;
-  treinamentos!: string[];
-  nrs!:          string[];
-}
-
-class ResumoRelatorioDto {
-  dados!:          any;
-  tipoRelatorio!:  string;
-}
-
-@ApiTags('IA — Assistente PeopleCore')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('ia')
+@UseGuards(JwtAuthGuard)
 export class IaController {
-  constructor(private readonly service: IaService) {}
+  constructor(private readonly iaService: IaService) {}
 
   @Post('chat')
-  @HttpCode(HttpStatus.OK)
-  chat(@Body() dto: ChatDto) {
-    return this.service.chat(dto.mensagem, dto.historico ?? [], dto.contexto);
-  }
-
-  @Post('sst/analise')
-  @HttpCode(HttpStatus.OK)
-  analisarSST(@Body() dto: SstAnaliseDto) {
-    return this.service.analisarConformidadeSST(dto.dadosEmpresa);
-  }
-
-  @Post('treinamentos/sugestao')
-  @HttpCode(HttpStatus.OK)
-  sugerirTreinamentos(@Body() dto: TreinamentoSugestaoDto) {
-    return this.service.sugerirTreinamentos(dto);
-  }
-
-  @Post('relatorio/resumo')
-  @HttpCode(HttpStatus.OK)
-  resumirRelatorio(@Body() dto: ResumoRelatorioDto) {
-    return this.service.resumirRelatorio(dto.dados, dto.tipoRelatorio);
+  async chat(
+    @Request() req,
+    @Body() chatRequest: ChatRequestDto,
+  ) {
+    console.log('IaController - Chat request received:', chatRequest);
+    
+    const { mensagem } = chatRequest;
+    
+    if (!mensagem || mensagem.trim() === '') {
+      return {
+        success: false,
+        message: 'Mensagem não pode ser vazia',
+        resposta: null,
+      };
+    }
+    
+    const empresaId = req.user?.empresaId || null;
+    
+    const response = await this.iaService.processarMensagem(mensagem, empresaId);
+    
+    return {
+      success: true,
+      resposta: response,
+    };
   }
 }

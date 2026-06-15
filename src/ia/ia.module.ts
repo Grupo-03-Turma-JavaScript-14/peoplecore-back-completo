@@ -1,12 +1,13 @@
+// src/ia.module.ts
 import { Module } from '@nestjs/common';
-import { IaService } from './services/ia.service';
-import { GeminiService } from './services/gemini.service';
-import { GroqService } from './services/groq.service';
+import { HttpModule } from '@nestjs/axios';
 import { IaController } from './controllers/ia.controller';
+import { IaService } from './services/ia.service';
 
 @Module({
-  providers:   [IaService, GeminiService, GroqService],
+  imports: [HttpModule],
   controllers: [IaController],
-  exports:     [IaService],
+  providers: [IaService],
+  exports: [IaService],
 })
 export class IaModule {}

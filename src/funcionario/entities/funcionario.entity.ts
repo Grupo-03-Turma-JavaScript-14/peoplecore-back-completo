@@ -1,7 +1,24 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  AfterLoad,
+} from 'typeorm';
+
 import { Usuario } from '../../usuario/entities/usuario.entity';
-import { Categoria } from '../../departamento/entities/categoria.entity';
+import { Categoria } from '../../rh/departamento/entities/categoria.entity';
+import { Empresa } from '../../empresa/entities/empresa.entity';
+import { Admissao } from '../../DepartamentoPessoal/admissao/entities/admissao.entity';
+import { Funcao } from '../../rh/funcao/entities/funcao.entity';
+
+export enum StatusFuncionario {
+  ATIVO = 'ATIVO',
+  INATIVO = 'INATIVO',
+}
 
 @Entity({ name: 'tb_funcionario' })
 export class Funcionario {
@@ -12,127 +29,78 @@ export class Funcionario {
   @Column({ length: 255, nullable: false })
   nome!: string;
 
-  @IsNotEmpty()
-  @Column({ length: 255, nullable: false })
-  cargo!: string;
+  @Column({ length: 255, nullable: true })
+  cargo?: string;
 
-  @IsNotEmpty()
-  @Column()
-  horasTrabalhadas!: number;
+  @Column({ nullable: true })
+  horasTrabalhadas?: number;
 
-  @IsNotEmpty()
-  @Column('float')
-  salarioBase!: number;
+  @Column('float', { nullable: true })
+  salarioBase?: number;
 
   salarioTotal?: number;
 
-  // ========== NOVOS CAMPOS ==========
+  @AfterLoad()
+  calcularSalarioVirtual() {
+    this.salarioTotal =
+      (this.horasTrabalhadas || 0) * (this.salarioBase || 0);
+  }
+
+  // Relacionamentos e Chaves Estrangeiras
+
+  @Column({ name: 'admissao_id', nullable: true })
+  admissaoId?: number;
+
+  @OneToOne(() => Admissao, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'admissao_id' })
+  admissao?: Admissao;
+
+  @Column({ name: 'categoria_id', nullable: true })
+  categoriaId?: number;
+
+  @ManyToOne(
+    () => Categoria,
+    (categoria) => categoria.funcionarios,
+    { nullable: true },
+  )
+  @JoinColumn({ name: 'categoria_id' })
+  categoria?: Categoria;
+
+  @Column({ name: 'funcao_id', nullable: true })
+  funcaoId?: number;
+
+  @ManyToOne(() => Funcao, { nullable: true })
+  @JoinColumn({ name: 'funcao_id' })
+  funcao?: Funcao;
+
+  @Column({ nullable: true })
+  empresaId?: number;
+
+  @ManyToOne(() => Empresa)
+  @JoinColumn({ name: 'empresaId' })
+  empresa?: Empresa;
+
+  @ManyToOne(() => Usuario, { nullable: true })
+  @JoinColumn({ name: 'usuario_id' })
+  usuario?: Usuario;
+
+  // Demais campos
+
   @IsOptional()
-  @Column({ length: 20, nullable: true })
+  @Column({ nullable: true })
   matricula?: string;
 
   @IsOptional()
-  @Column({ length: 14, nullable: true })
+  @Column({ nullable: true })
   cpf?: string;
 
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  rg?: string;
-
-  @IsOptional()
-  @Column({ type: 'date', nullable: true })
-  dataNascimento?: string;
-
-  @IsOptional()
-  @Column({ length: 255, nullable: true })
-  endereco?: string;
-
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  telefone?: string;
-
-  @IsOptional()
-  @Column({ length: 255, nullable: true })
-  email?: string;
-
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  pis?: string;
-
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  ctpsNumero?: string;
-
-  @IsOptional()
-  @Column({ length: 10, nullable: true })
-  ctpsSerie?: string;
-
-  @IsOptional()
-  @Column({ length: 50, nullable: true })
-  estadoCivil?: string;
-
-  @IsOptional()
-  @Column({ length: 50, nullable: true })
-  nacionalidade?: string;
-
-  @IsOptional()
-  @Column({ length: 100, nullable: true })
-  naturalidade?: string;
-
-  @IsOptional()
-  @Column({ type: 'date', nullable: true })
-  dataAdmissao?: string;
-
-  @IsOptional()
-  @Column({ length: 50, nullable: true })
-  tipoContrato?: string;
-
-  @IsOptional()
-  @Column({ length: 50, nullable: true })
-  banco?: string;
-
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  agencia?: string;
-
-  @IsOptional()
-  @Column({ length: 20, nullable: true })
-  conta?: string;
-
-  @IsOptional()
-  @Column({ length: 30, nullable: true })
-  tipoConta?: string;
-
-  @IsOptional()
-  @Column({ length: 10, nullable: true })
-  tamanhoCamisa?: string;
-
-  @IsOptional()
-  @Column({ length: 10, nullable: true })
-  tamanhoCalca?: string;
-
-  @IsOptional()
-  @Column({ length: 10, nullable: true })
-  tamanhoBota?: string;
-
-  @IsOptional()
-  @Column({ length: 10, nullable: true })
-  tamanhoLuva?: string;
-
-  @IsOptional()
-  @Column({ type: 'simple-array', nullable: true })
-  fatoresRisco?: string[];
-
-  @IsOptional()
-  @Column({ length: 50, nullable: true })
-  status?: string;
-
-  // ========== RELACIONAMENTOS ==========
-  @ManyToOne(() => Usuario, (usuario) => usuario.funcionarios)
-  @JoinColumn({ name: 'usuario_id' })
-  usuario!: Usuario;
-
-  @ManyToOne(() => Categoria, (categoria) => categoria.funcionarios)
-  @JoinColumn({ name: 'categoria_id' })
-  categoria!: Categoria;
+  @Column({
+    type: 'enum',
+    enum: StatusFuncionario,
+    default: StatusFuncionario.ATIVO,
+  })
+  status!: StatusFuncionario;
 }

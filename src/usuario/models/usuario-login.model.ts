@@ -1,9 +1,14 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+
 export class UsuarioLogin {
-    id?: number;
-    nome?: string;
-    usuario!: string;
-    senha?: string;
-    foto?: string;
-    role?: string;  // ← ADICIONAR ESTA LINHA
-    token?: string;
+  @ApiProperty({ example: 'admin@peoplecore.com.br' })
+  @IsNotEmpty()
+  @IsString()
+  usuario!: string;
+
+  @ApiProperty({ example: 'admin123' })
+  @IsNotEmpty()
+  @IsString()
+  senha!: string;
 }

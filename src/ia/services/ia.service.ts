@@ -1,68 +1,147 @@
+// src/ia/services/ia.service.ts
 import { Injectable, Logger } from '@nestjs/common';
-import { GeminiService } from './gemini.service';
-import { GroqService } from './groq.service';
-import { RH_ASSISTANT_PROMPT, SST_COMPLIANCE_PROMPT } from '../prompts/rh-assistant.prompt';
-import { TREINAMENTO_SUGESTAO_PROMPT } from '../prompts/treinamento-sugestao.prompt';
-
-export interface MensagemChat {
-  role:    'user' | 'assistant';
-  content: string;
-}
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 @Injectable()
 export class IaService {
   private readonly logger = new Logger(IaService.name);
+  private readonly genAI: GoogleGenerativeAI;
+  private readonly model: any;
 
-  constructor(
-    private readonly gemini: GeminiService,
-    private readonly groq:   GroqService,
-  ) {}
+  constructor() {
+    const apiKey = process.env.GEMINI_API_KEY;
+    
+    if (!apiKey) {
+      this.logger.error('GEMINI_API_KEY não configurada');
+      throw new Error('GEMINI_API_KEY não configurada no ambiente');
+    }
+    
+    this.genAI = new GoogleGenerativeAI(apiKey);
+    
+    // Usar any para contornar a tipagem que ainda não suporta googleSearch
+    const config: any = {
+      model: 'gemini-2.0-flash',
+      tools: [{ googleSearch: {} }]
+    };
+    
+    this.model = this.genAI.getGenerativeModel(config, { apiVersion: 'v1beta' });
+    
+    this.logger.log('IA Service inicializado com suporte a Google Search');
+  }
 
-  async chat(mensagem: string, historico: MensagemChat[] = [], contexto?: string): Promise<string> {
-    const prompt = `${RH_ASSISTANT_PROMPT.replace('{{contexto}}', contexto ?? 'Não informado')}\n\nPergunta: ${mensagem}`;
+  async processarMensagem(mensagem: string, empresaId?: number): Promise<string> {
+    this.logger.log(`Processando mensagem: ${mensagem}`);
+    this.logger.log(`Empresa ID: ${empresaId}`);
+
+    if (!mensagem || mensagem.trim() === '') {
+      throw new Error('Mensagem não pode ser vazia');
+    }
+
+    const prompt = this.buildPrompt(mensagem, empresaId);
+
     try {
-      return await this.gemini.gerarResposta(prompt);
-    } catch (err) {
-      this.logger.warn('Gemini falhou, usando Groq como fallback');
-      const msgs = [
-        { role: 'system', content: RH_ASSISTANT_PROMPT },
-        ...historico,
-        { role: 'user', content: mensagem },
-      ];
-      return this.groq.gerarResposta(msgs);
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      
+      // Tentar extrair fontes da resposta
+      const sources = this.extractSourcesFromResponse(response);
+      
+      this.logger.log('Resposta gerada com sucesso');
+      
+      if (sources) {
+        return `${text}\n\n📚 **Fontes consultadas:**\n${sources}`;
+      }
+      
+      return text;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      this.logger.error(`Erro ao processar mensagem: ${errorMessage}`);
+      
+      // Retorna mensagem amigável para o usuário
+      if (errorMessage.includes('429') || errorMessage.includes('quota')) {
+        return `🔍 **Sua pergunta:** "${mensagem}"
+
+⚠️ **O serviço de busca está temporariamente indisponível.** (Limite de requisições excedido)
+
+📌 **Alternativas:**
+1. Aguarde alguns minutos e tente novamente
+2. Pesquise diretamente no Google: 
+   https://www.google.com/search?q=${encodeURIComponent(mensagem)}
+
+💡 O PeopleCore com Gemini Search trará respostas atualizadas com fontes quando a API estiver disponível.`;
+      }
+      
+      return `❌ **Erro ao processar sua solicitação.**
+
+**Sua pergunta:** "${mensagem}"
+
+**Erro:** ${errorMessage}
+
+Tente novamente em alguns instantes.`;
     }
   }
 
-  async analisarConformidadeSST(dadosEmpresa: any): Promise<string> {
-    const prompt = SST_COMPLIANCE_PROMPT.replace(
-      '{{dados}}',
-      JSON.stringify(dadosEmpresa, null, 2),
-    );
-    return this.gemini.gerarResposta(prompt);
+  private extractSourcesFromResponse(response: any): string | null {
+    try {
+      // Tentar acessar o grounding metadata de diferentes formas
+      const candidates = response?.candidates;
+      if (candidates && candidates[0]) {
+        // Verificar se há groundingMetadata
+        const groundingMetadata = candidates[0].groundingMetadata;
+        if (groundingMetadata?.groundingChunks) {
+          const sources = new Set<string>();
+          for (const chunk of groundingMetadata.groundingChunks) {
+            if (chunk.web?.uri) {
+              sources.add(chunk.web.uri);
+            }
+          }
+          if (sources.size > 0) {
+            return Array.from(sources).map((url, i) => `${i + 1}. ${url}`).join('\n');
+          }
+        }
+        
+        // Verificar se há citationSources
+        if (candidates[0].citationSources?.length) {
+          const sources = new Set<string>();
+          for (const source of candidates[0].citationSources) {
+            if (source.uri) {
+              sources.add(source.uri);
+            }
+          }
+          if (sources.size > 0) {
+            return Array.from(sources).map((url, i) => `${i + 1}. ${url}`).join('\n');
+          }
+        }
+      }
+      return null;
+    } catch (error) {
+      this.logger.debug('Não foi possível extrair fontes da resposta');
+      return null;
+    }
   }
 
-  async sugerirTreinamentos(perfil: {
-    cargo:        string;
-    departamento: string;
-    treinamentos: string[];
-    nrs:          string[];
-  }): Promise<any> {
-    const prompt = TREINAMENTO_SUGESTAO_PROMPT
-      .replace('{{cargo}}',         perfil.cargo)
-      .replace('{{departamento}}',  perfil.departamento)
-      .replace('{{treinamentos}}',  perfil.treinamentos.join(', ') || 'Nenhum')
-      .replace('{{nrs}}',           perfil.nrs.join(', ') || 'Não especificadas');
-    return this.gemini.gerarRespostaJson(prompt);
-  }
+  private buildPrompt(mensagem: string, empresaId?: number): string {
+    return `Você é o Assistente PeopleCore, especialista em RH, SST e legislação trabalhista brasileira.
 
-  async resumirRelatorio(dados: any, tipoRelatorio: string): Promise<string> {
-    const prompt = `
-Você é assistente de RH do PeopleCore ERP. Resuma o seguinte relatório de ${tipoRelatorio} em linguagem clara para gestores, destacando os pontos mais importantes, tendências e recomendações de ação.
+**IMPORTANTE:** Você TEM ACESSO ao Google Search. Use-o para buscar informações atualizadas SEMPRE que precisar de:
+- Legislação trabalhista atual (CLT, NRs, leis, decretos, portarias)
+- Cálculos (férias, 13º, rescisão, hora extra, INSS, IRRF)
+- Valores atualizados (salário mínimo, teto do INSS, taxas, prazos)
+- Mudanças recentes na legislação
+- Jurisprudência e decisões judiciais
 
-Dados: ${JSON.stringify(dados, null, 2)}
+**Contexto da empresa:** ${empresaId ? 'Usuário logado em uma empresa específica' : 'Acesso geral do sistema'}
 
-Responda em português brasileiro, de forma concisa e estruturada.
-    `.trim();
-    return this.gemini.gerarResposta(prompt);
+**Pergunta do usuário:** ${mensagem}
+
+**Instruções de resposta:**
+1. Responda de forma clara, objetiva e profissional
+2. SEMPRE pesquise no Google para confirmar informações atuais
+3. Cite as fontes das suas informações (URLs quando disponíveis)
+4. Para cálculos, mostre a fórmula e um exemplo prático
+5. Se a pergunta for sobre datas, valores ou leis, pesquise primeiro
+
+Responda em português brasileiro.`;
   }
 }

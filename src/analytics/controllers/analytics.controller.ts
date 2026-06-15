@@ -1,8 +1,22 @@
-import { Controller, Get, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+
+import {
+  ApiBearerAuth,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+
 import { JwtAuthGuard } from '../../autenticacao/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
-import { Roles, Role } from '../../common/decorators/roles.decorator';
+import { Roles } from '../../common/decorators/roles.decorator';
+
+import { CompanyRole } from '../../common/enums/company-role.enum';
+
 import { AnalyticsService } from '../services/analytics.service';
 import { HeadcountService } from '../services/headcount.service';
 import { TurnoverService } from '../services/turnover.service';
@@ -10,13 +24,13 @@ import { TurnoverService } from '../services/turnover.service';
 @ApiTags('People Analytics')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN, Role.RH)
+@Roles(CompanyRole.ADMIN, CompanyRole.RH)
 @Controller('analytics')
 export class AnalyticsController {
   constructor(
     private readonly analyticsService: AnalyticsService,
     private readonly headcountService: HeadcountService,
-    private readonly turnoverService:  TurnoverService,
+    private readonly turnoverService: TurnoverService,
   ) {}
 
   @Get('dashboard')
@@ -33,16 +47,24 @@ export class AnalyticsController {
   }
 
   @Get('headcount')
-  headcountTotal() { return this.headcountService.headcountTotal(); }
+  headcountTotal() {
+    return this.headcountService.headcountTotal();
+  }
 
   @Get('headcount/departamentos')
-  headcountPorDepartamento() { return this.headcountService.headcountPorDepartamento(); }
+  headcountPorDepartamento() {
+    return this.headcountService.headcountPorDepartamento();
+  }
 
   @Get('headcount/cargos')
-  headcountPorCargo() { return this.headcountService.headcountPorCargo(); }
+  headcountPorCargo() {
+    return this.headcountService.headcountPorCargo();
+  }
 
   @Get('folha/departamentos')
-  custoFolha() { return this.headcountService.custoFolhaPorDepartamento(); }
+  custoFolha() {
+    return this.headcountService.custoFolhaPorDepartamento();
+  }
 
   @Get('turnover')
   @ApiQuery({ name: 'ano', example: 2025 })

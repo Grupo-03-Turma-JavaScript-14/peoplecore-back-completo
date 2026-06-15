@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
-import { Contrato, StatusContrato } from '../../contrato/entities/contrato.entity';
+import { ContratoTrabalho, StatusContratoTrabalho } from '../../DepartamentoPessoal/contratotrabalhista/entities/contrato-trabalho.entity';
 
 export interface DadosTurnover {
   admissoes:     number;
@@ -17,8 +17,8 @@ export interface DadosTurnoverMes extends DadosTurnover {
 @Injectable()
 export class TurnoverService {
   constructor(
-    @InjectRepository(Contrato)
-    private readonly contratoRepo: Repository<Contrato>,
+    @InjectRepository(ContratoTrabalho)  // ← corrigido
+    private readonly contratoRepo: Repository<ContratoTrabalho>,
   ) {}
 
   async calcularTaxaTurnover(ano: number, mes: number): Promise<DadosTurnover> {
@@ -30,11 +30,11 @@ export class TurnoverService {
     });
 
     const desligamentos = await this.contratoRepo.count({
-      where: { dataRescisao: Between(inicio, fim) as any, status: StatusContrato.ENCERRADO },
+      where: { dataRescisao: Between(inicio, fim) as any, status: StatusContratoTrabalho.ENCERRADO }, // ← corrigido
     });
 
     const totalAtivos = await this.contratoRepo.count({
-      where: { status: StatusContrato.ATIVO },
+      where: { status: StatusContratoTrabalho.ATIVO }, // ← corrigido
     });
 
     const taxaTurnover = totalAtivos > 0
@@ -44,12 +44,11 @@ export class TurnoverService {
     return { admissoes, desligamentos, taxaTurnover, totalAtivos };
   }
 
-  // ✅ array tipado explicitamente — evita inferência como never[]
   async historicoPorAno(ano: number): Promise<DadosTurnoverMes[]> {
     const meses: DadosTurnoverMes[] = [];
     for (let mes = 1; mes <= 12; mes++) {
       const dados = await this.calcularTaxaTurnover(ano, mes);
-      meses.push({ mes, ...dados });           // ✅ sem erro de tipo
+      meses.push({ mes, ...dados });
     }
     return meses;
   }

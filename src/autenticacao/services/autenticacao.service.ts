@@ -1,52 +1,84 @@
 import * as bcrypt from 'bcryptjs';
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
-import { UsuarioLogin } from "../../usuario/models/usuario-login.model";
-import { UsuarioService } from "../../usuario/services/usuario.service";
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UsuarioService } from '../../usuario/services/usuario.service';
+import { EmpresaService } from '../../empresa/empresa.service';
+import { UsuarioLogin } from '../../usuario/models/usuario-login.model';
+import { GlobalRole } from '../../common/enums/global-role.enum';
 
 @Injectable()
 export class AutenticacaoService {
+  constructor(
+    private readonly usuarioService: UsuarioService,
+    private readonly empresaService: EmpresaService,
+    private readonly jwtService: JwtService,
+  ) { }
 
-    constructor(
-        private usuarioService: UsuarioService,
-        private jwtService: JwtService
-    ) { }
+  async checkSetup() {
+    const userCount = await this.usuarioService.countAll();
+    const empresaCount = await this.empresaService.countAll();
 
-    async login(usuarioLogin: UsuarioLogin): Promise<UsuarioLogin> {
+    return {
+      configured: userCount > 0 && empresaCount > 0,
+      userCreated: userCount > 0
+    };
+  }
 
-        const usuario = await this.usuarioService.findByEmailExato(usuarioLogin.usuario);
+  async register(dto: { nome: string; usuario: string; senha: string; empresaId: number }) {
+    const usuario = await this.usuarioService.create({
+      nome: dto.nome,
+      usuario: dto.usuario,
+      senha: dto.senha,
+      empresaId: dto.empresaId,
+      globalRole: GlobalRole.SUPER_ADMIN,
+      mustChangePassword: false,
+    });
 
-        if (!usuario) {
-            throw new HttpException("Usuário não encontrado!", HttpStatus.UNAUTHORIZED);
-        }
+    const payload = {
+      sub: usuario.id,
+      usuario: usuario.usuario,
+      globalRole: usuario.globalRole,
+      companyRole: usuario.companyRole, // Garantido aqui
+      empresaId: usuario.empresaId,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: usuario,
+    };
+  }
 
-        if (!usuarioLogin.senha) {
-            throw new HttpException("Senha não informada!", HttpStatus.UNAUTHORIZED);
-        }
+  async login(usuarioLogin: UsuarioLogin) {
+    const usuario = await this.usuarioService.findByUsuarioWithPassword(usuarioLogin.usuario);
+    if (!usuario) throw new HttpException('Usuário inválido', HttpStatus.UNAUTHORIZED);
 
-        const senhaValida = await bcrypt.compare(usuarioLogin.senha, usuario.senha);
+    const senhaOk = await bcrypt.compare(usuarioLogin.senha, usuario.senha!);
+    if (!senhaOk) throw new HttpException('Senha inválida', HttpStatus.UNAUTHORIZED);
 
-        if (!senhaValida) {
-            throw new HttpException("Senha inválida!", HttpStatus.UNAUTHORIZED);
-        }
+    // CORREÇÃO: Incluindo companyRole no payload do login
+    const payload = {
+      sub: usuario.id,
+      usuario: usuario.usuario,
+      globalRole: usuario.globalRole,
+      companyRole: usuario.companyRole, 
+      mustChangePassword: usuario.mustChangePassword,
+      empresaId: usuario.empresaId,
+    };
 
-        // ✅ PAYLOAD COM A ROLE
-        const payload = {
-            sub: usuario.id,
-            usuario: usuario.usuario,
-            role: usuario.role  // ← PEGA A ROLE DO BANCO
-        };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: usuario,
+    };
+  }
 
-        const token = this.jwtService.sign(payload);
+  async changePassword(userId: number, currentPassword: string, newPassword: string) {
+    const usuario = await this.usuarioService.findByIdWithPassword(userId);
+    if (!usuario) throw new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND);
 
-        // ✅ RETORNA COM A ROLE
-        return {
-            id: usuario.id,
-            nome: usuario.nome,
-            usuario: usuario.usuario,
-            foto: usuario.foto,
-            role: usuario.role,  // ← RETORNA A ROLE
-            token: token
-        };
-    }
+    const senhaOk = await bcrypt.compare(currentPassword, usuario.senha!);
+    if (!senhaOk) throw new HttpException('Senha atual incorreta', HttpStatus.BAD_REQUEST);
+
+    await this.usuarioService.updatePasswordAndClearFlag(userId, newPassword);
+
+    return { message: 'Senha alterada com sucesso' };
+  }
 }

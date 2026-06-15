@@ -1,22 +1,23 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+// src/autenticacao/guards/jwt-auth.guard.ts
+import { Injectable, ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization;
-    console.log('[JwtAuthGuard] Token recebido:', token ? 'SIM' : 'NÃO');
-    console.log('[JwtAuthGuard] Rota:', request.url);
-    return super.canActivate(context);
+  constructor(private reflector: Reflector) {
+    super();
   }
 
-  handleRequest(err: any, user: any, info: any) {
-    console.log('[JwtAuthGuard] User encontrado:', user);
-    console.log('[JwtAuthGuard] Info:', info?.message);
-    if (err || !user) {
-      throw err || new UnauthorizedException('Token inválido');
+  canActivate(context: ExecutionContext) {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic) {
+      return true;
     }
-    return user;
+    return super.canActivate(context);
   }
 }

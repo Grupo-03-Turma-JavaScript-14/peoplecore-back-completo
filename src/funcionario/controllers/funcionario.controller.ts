@@ -1,49 +1,59 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
-import { Throttle, SkipThrottle } from '@nestjs/throttler'; // Importação necessária
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { FuncionarioService } from '../services/funcionario.service';
-import { Funcionario } from '../entities/funcionario.entity';
 import { DeleteResult } from 'typeorm';
 import { CreateFuncionarioDto } from '../dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from '../dto/update-funcionario.dto';
+import { FuncionarioResponseDto } from '../dto/funcionario.response.dto';
 
 @Controller('/funcionarios')
 export class FuncionarioController {
   constructor(private readonly funcionarioService: FuncionarioService) { }
 
-  @SkipThrottle() // Permite busca sem o limite restrito de 3 req/min
+  @SkipThrottle()
   @Get()
-  async findAll(): Promise<any[]> { // Alterado para 'any[]' ou um DTO de resposta
+  async findAll(): Promise<FuncionarioResponseDto[]> {
     const data = await this.funcionarioService.findAll();
-    // Aqui você pode mapear os dados para garantir que campos sensíveis do 'usuario' sejam removidos
-    return data.map(({ usuario, ...rest }) => rest); 
+    return data.map(item => ({
+      ...item,
+      categoriaId: item.categoria?.id,
+      empresaId: item.empresa?.id,
+      admissaoId: item.admissaoId
+    })) as unknown as FuncionarioResponseDto[];
   }
 
   @SkipThrottle()
   @Get('/:id')
-  async findById(@Param('id', ParseIntPipe) id: number): Promise<any> {
-    const data = await this.funcionarioService.findById(id);
-    const { usuario, ...rest } = data; // Destruturação para remover o objeto usuario
-    return rest;
+  async findById(@Param('id', ParseIntPipe) id: number): Promise<FuncionarioResponseDto> {
+    const item = await this.funcionarioService.findById(id);
+    return {
+      ...item,
+      categoriaId: item.categoria?.id,
+      empresaId: item.empresa?.id,
+      admissaoId: item.admissaoId
+    } as unknown as FuncionarioResponseDto;
   }
 
-  @Throttle({ default: { limit: 3, ttl: 60000 } }) // Limite rigoroso de 3 por minuto
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post()
-  create(@Body() funcionarioDto: CreateFuncionarioDto): Promise<Funcionario> {
-    return this.funcionarioService.create(funcionarioDto as any);
+  async create(@Body() funcionarioDto: CreateFuncionarioDto): Promise<FuncionarioResponseDto> {
+    const novoFuncionario = await this.funcionarioService.create(funcionarioDto);
+    return novoFuncionario as unknown as FuncionarioResponseDto;
   }
 
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Put('/:id')
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() funcionarioDto: UpdateFuncionarioDto,
-  ): Promise<Funcionario> {
-    return this.funcionarioService.update({ ...funcionarioDto, id } as any);
+  ): Promise<FuncionarioResponseDto> {
+    const atualizado = await this.funcionarioService.update(id, funcionarioDto);
+    return atualizado as unknown as FuncionarioResponseDto;
   }
 
   @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Delete('/:id')
-  delete(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
-    return this.funcionarioService.delete(id);
+  async delete(@Param('id', ParseIntPipe) id: number): Promise<DeleteResult> {
+    return await this.funcionarioService.delete(id);
   }
 }
