@@ -7,38 +7,22 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // FORCE CORS
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header(
-      'Access-Control-Allow-Methods',
-      'GET, POST, PUT, DELETE, OPTIONS, PATCH',
-    );
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-    );
-
-    if (req.method === 'OPTIONS') {
-      return res.status(200).send();
-    }
-
-    next();
+  // 1. Configuração de CORS simplificada e eficiente
+  app.enableCors({
+    origin: '*', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
   });
 
+  // 2. Pipes de validação
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
     }),
   );
-  app.enableCors({
-  origin: '*', 
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  credentials: true,
-});
 
-  // SWAGGER
+  // 3. SWAGGER
   const config = new DocumentBuilder()
     .setTitle('PeopleCore API')
     .setDescription('Documentação da API PeopleCore')
@@ -47,13 +31,13 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000, '0.0.0.0');
+  // 4. Porta Dinâmica (O Railway injeta a porta na variável process.env.PORT)
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
 
-  console.log('🚀 PeopleCore rodando em http://localhost:3000');
-  console.log('📚 Swagger em http://localhost:3000/api');
+  console.log(`🚀 PeopleCore rodando na porta ${port}`);
 }
 
 bootstrap();
