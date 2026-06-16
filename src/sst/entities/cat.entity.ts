@@ -27,19 +27,19 @@ export class Cat {
   @Column({ type: 'timestamp' })
   dataAcidente!: Date;
 
-  @Column({ length: 500 })
+  @Column({ type: 'varchar', length: 500 })
   descricaoAcidente!: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   parteAtingida!: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   agenteCausador!: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   localAcidente!: string;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   enviadoEsocial!: boolean;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
@@ -49,12 +49,12 @@ export class Cat {
   planoAcao!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataAfastamento!: Date; 
+  dataAfastamento!: Date | null; 
 
   @Column({ type: 'date', nullable: true })
-  dataRetorno!: Date; 
+  dataRetorno!: Date | null; 
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'criado_em' })
   criadoEm!: Date;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
