@@ -7,9 +7,12 @@ export class ProdService {
     return {
       type: 'mysql',
       url: process.env.DATABASE_URL,
+
       autoLoadEntities: true,
-      synchronize: false,
-      logging: false,
+
+      // TEMPORÁRIO
+      synchronize: true,
+      logging: true,
     };
   }
 }
