@@ -7,7 +7,6 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-
   app.enableCors({
     origin: '*', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -22,7 +21,6 @@ async function bootstrap() {
     }),
   );
 
-
   const config = new DocumentBuilder()
     .setTitle('PeopleCore API')
     .setDescription('Documentação oficial da API PeopleCore')
@@ -32,14 +30,15 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
  
-  SwaggerModule.setup('api/docs', app, document);
+  // Rota alterada para /swagger
+  SwaggerModule.setup('swagger', app, document);
 
   const port = process.env.PORT || 3000;
   
   await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 PeopleCore rodando na porta ${port}`);
-  console.log(`📄 Documentação disponível em: http://localhost:${port}/api/docs`);
+  console.log(`📄 Documentação disponível em: http://localhost:${port}/swagger`);
 }
 
 bootstrap();
