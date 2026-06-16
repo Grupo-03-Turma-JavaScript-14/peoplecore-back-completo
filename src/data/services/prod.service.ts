@@ -8,9 +8,11 @@ export class ProdService {
 
       autoLoadEntities: true,
 
-      synchronize: true, // <- mudar aqui
+      synchronize: true,
 
       logging: true,
+
+      logger: 'advanced-console',
     };
   }
 }
