@@ -15,10 +15,17 @@ export class ProdService {
         Empresa,
         Filial,
         Contrato,
+        __dirname + '/../../**/*.entity{.ts,.js}',
       ],
 
+      autoLoadEntities: true,
+
       synchronize: true,
+
       logging: true,
+
+      retryAttempts: 10,
+      retryDelay: 3000,
     };
   }
 }
