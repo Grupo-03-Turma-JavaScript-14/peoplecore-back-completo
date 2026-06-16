@@ -23,8 +23,6 @@ import { GlobalRole } from "../../common/enums/global-role.enum";
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
-  // 🔥 ROTA PÚBLICA PARA CONFIGURAÇÃO INICIAL
-  // Necessária para vincular o Admin à Empresa criada
   @Post(":id/vincular-empresa")
   async vincularEmpresa(
     @Param("id", ParseIntPipe) id: number,

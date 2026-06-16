@@ -17,9 +17,6 @@ import { CreateContratoDto } from './dto/create-contrato.dto';
 
 import { JwtAuthGuard } from '../autenticacao/guards/jwt-auth.guard';
 import type { Request } from 'express';
-
-// 🔥 Removi o @UseGuards(JwtAuthGuard) global daqui.
-// Vamos proteger apenas as rotas que realmente precisam de login.
 @Controller('empresas') 
 export class EmpresaController {
   constructor(private readonly service: EmpresaService) {}
