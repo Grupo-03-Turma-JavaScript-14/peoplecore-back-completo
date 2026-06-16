@@ -1,5 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { join } from 'path';
+import { Empresa } from '../../empresa/entities/empresa.entity';
+import { Filial } from '../../empresa/entities/filial.entity';
+import { Contrato } from '../../empresa/entities/contrato.entity';
 
 export class ProdService {
   createTypeOrmOptions(): TypeOrmModuleOptions {
@@ -9,7 +11,11 @@ export class ProdService {
       type: 'mysql',
       url: process.env.DATABASE_URL,
 
-      entities: [join(__dirname, '../../**/*.entity.js')],
+      entities: [
+        Empresa,
+        Filial,
+        Contrato,
+      ],
 
       synchronize: true,
       logging: true,
