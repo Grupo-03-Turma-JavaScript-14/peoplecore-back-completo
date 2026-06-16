@@ -3,10 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+
 import { AppController } from './app.controller';
 import { UploadController } from './upload/upload.controller';
+
 import { ProdService } from './data/services/prod.service';
-import { DevService } from './data/services/dev.service';
+
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { EmpresaModule } from './empresa/empresa.module';
@@ -18,9 +20,9 @@ import { AdmissaoModule } from './DepartamentoPessoal/admissao/admissao.module';
 import { ContratoTrabalhoModule } from './DepartamentoPessoal/contratotrabalhista/contrato-trabalho.module';
 import { FeriasModule } from './DepartamentoPessoal/ferias/ferias.module';
 import { FolhaModule } from './DepartamentoPessoal/folha/folha.module';
-import { IaModule } from './ia/ia.module'
+import { IaModule } from './ia/ia.module';
 import { SstModule } from './sst/sst.module';
-import { PromocaoModule } from './rh/promocao/promocao.module'
+import { PromocaoModule } from './rh/promocao/promocao.module';
 import { TreinamentoModule } from './rh/treinamento/treinamento.module';
 import { EsocialModule } from './esocial/esocial.module';
 import { PontoModule } from './DepartamentoPessoal/ponto/ponto.module';
@@ -33,14 +35,27 @@ import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{ name: 'short', ttl: 1000, limit: 10 }]),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 10,
+      },
+    ]),
+
     TypeOrmModule.forRootAsync({
       useFactory: () => {
-        const isProd = process.env.NODE_ENV === 'production';
-        return isProd ? new ProdService().createTypeOrmOptions() : new DevService().createTypeOrmOptions();
+        console.log('NODE_ENV =>', process.env.NODE_ENV);
+        console.log('DATABASE_URL =>', process.env.DATABASE_URL);
+
+        return new ProdService().createTypeOrmOptions();
       },
     }),
+
     AutenticacaoModule,
     UsuarioModule,
     EmpresaModule,
@@ -64,14 +79,19 @@ import { AnalyticsModule } from './analytics/analytics.module';
     AfastamentoModule,
     AnalyticsModule,
     AdvertenciaModule,
-
-
   ],
-  controllers: [AppController, UploadController],
+
+  controllers: [
+    AppController,
+    UploadController,
+  ],
+
   providers: [
-    DevService,
     ProdService,
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}
