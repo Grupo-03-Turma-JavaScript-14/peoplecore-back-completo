@@ -31,10 +31,10 @@ export class Laudo {
   @Column({ type: 'enum', enum: StatusLaudo, default: StatusLaudo.VIGENTE })
   status!: StatusLaudo;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   responsavelTecnico!: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   crea!: string;
 
   @Column({ type: 'date' })
@@ -43,13 +43,13 @@ export class Laudo {
   @Column({ type: 'date' })
   dataVencimento!: Date;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   descricao!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   urlDocumento!: string;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   nrRelacionada!: string;
 
   @CreateDateColumn()

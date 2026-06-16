@@ -25,27 +25,29 @@ export class Ferias {
   @Column({ default: false })
   tercoVendido!: boolean;
 
-  @Column('float', { nullable: true })
+
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
   valorPago!: number;
 
   @Column({ type: 'enum', enum: StatusFerias, default: StatusFerias.SOLICITADA })
   status!: StatusFerias;
 
-  @Column({ nullable: true })
-  observacao?: string;
+ 
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  observacao!: string;
 
   @Column({ type: 'int' })
   periodoAquisitivoAno!: number;
 
-  // Campos de aprovação
-  @Column({ nullable: true })
-  aprovadorNome?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  aprovadorNome!: string;
 
-  @Column({ nullable: true })
-  departamentoAprovador?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  departamentoAprovador!: string;
 
-  @Column({ nullable: true })
-  aprovadoPorId?: number;
+
+  @Column({ type: 'int', nullable: true })
+  aprovadoPorId!: number;
 
   @Column({ type: 'timestamp', nullable: true })
   aprovadoEm?: Date;

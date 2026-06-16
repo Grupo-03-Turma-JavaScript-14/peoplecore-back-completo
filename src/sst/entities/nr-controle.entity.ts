@@ -12,19 +12,19 @@ export class NrControle {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 10 })
+  @Column({ type: 'varchar', length: 10 })
   numero!: string;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   nome!: string;
 
   @Column({ type: 'enum', enum: StatusNR, default: StatusNR.NAO_CONFORME })
   status!: StatusNR;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   descricaoNaoConformidade!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   planoAcao!: string;
 
   @Column({ type: 'date', nullable: true })
@@ -36,7 +36,7 @@ export class NrControle {
   @Column({ type: 'date', nullable: true })
   dataProximaAuditoria!: Date;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   responsavel!: string;
 
   @Column({ default: false })

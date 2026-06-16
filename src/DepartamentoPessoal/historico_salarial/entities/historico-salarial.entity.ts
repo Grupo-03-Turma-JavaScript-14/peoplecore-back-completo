@@ -1,8 +1,9 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tb_historico_salarial' })
 export class HistoricoSalarial {
-  @Column({ primary: true, generated: true })
+
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
@@ -11,15 +12,14 @@ export class HistoricoSalarial {
   @Column({ type: 'date' })
   dataAlteracao!: string;
 
-  @Column('float')
   salarioAnterior!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   salarioNovo!: number;
 
-  @Column({ nullable: true })
-  motivo?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  motivo!: string;
 
-  @Column({ nullable: true })
-  observacao?: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  observacao!: string;
 }

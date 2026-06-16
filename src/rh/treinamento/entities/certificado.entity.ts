@@ -15,7 +15,7 @@ export class Certificado {
   @Column({ type: 'date', nullable: true })
   dataVencimento!: Date;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   urlDocumento!: string;
 
   @CreateDateColumn()

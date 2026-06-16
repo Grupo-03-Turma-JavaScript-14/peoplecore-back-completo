@@ -26,17 +26,17 @@ export class Funcionario {
   id!: number;
 
   @IsNotEmpty()
-  @Column({ length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   nome!: string;
 
-  @Column({ length: 255, nullable: true })
-  cargo?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  cargo!: string;
 
-  @Column({ nullable: true })
-  horasTrabalhadas?: number;
+  @Column({ type: 'int', nullable: true })
+  horasTrabalhadas!: number;
 
-  @Column('float', { nullable: true })
-  salarioBase?: number;
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  salarioBase!: number;
 
   salarioTotal?: number;
 
@@ -46,10 +46,8 @@ export class Funcionario {
       (this.horasTrabalhadas || 0) * (this.salarioBase || 0);
   }
 
-  // Relacionamentos e Chaves Estrangeiras
-
-  @Column({ name: 'admissao_id', nullable: true })
-  admissaoId?: number;
+  @Column({ type: 'int', name: 'admissao_id', nullable: true })
+  admissaoId!: number;
 
   @OneToOne(() => Admissao, {
     nullable: true,
@@ -58,8 +56,8 @@ export class Funcionario {
   @JoinColumn({ name: 'admissao_id' })
   admissao?: Admissao;
 
-  @Column({ name: 'categoria_id', nullable: true })
-  categoriaId?: number;
+  @Column({ type: 'int', name: 'categoria_id', nullable: true })
+  categoriaId!: number;
 
   @ManyToOne(
     () => Categoria,
@@ -69,15 +67,15 @@ export class Funcionario {
   @JoinColumn({ name: 'categoria_id' })
   categoria?: Categoria;
 
-  @Column({ name: 'funcao_id', nullable: true })
-  funcaoId?: number;
+  @Column({ type: 'int', name: 'funcao_id', nullable: true })
+  funcaoId!: number;
 
   @ManyToOne(() => Funcao, { nullable: true })
   @JoinColumn({ name: 'funcao_id' })
   funcao?: Funcao;
 
-  @Column({ nullable: true })
-  empresaId?: number;
+  @Column({ type: 'int', nullable: true })
+  empresaId!: number;
 
   @ManyToOne(() => Empresa)
   @JoinColumn({ name: 'empresaId' })
@@ -87,15 +85,13 @@ export class Funcionario {
   @JoinColumn({ name: 'usuario_id' })
   usuario?: Usuario;
 
-  // Demais campos
+  @IsOptional()
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  matricula!: string;
 
   @IsOptional()
-  @Column({ nullable: true })
-  matricula?: string;
-
-  @IsOptional()
-  @Column({ nullable: true })
-  cpf?: string;
+  @Column({ type: 'varchar', length: 14, nullable: true })
+  cpf!: string;
 
   @Column({
     type: 'enum',

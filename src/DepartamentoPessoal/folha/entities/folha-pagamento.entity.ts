@@ -18,43 +18,43 @@ export class FolhaPagamento {
   @Column()
   ano!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   salarioBruto!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   descontoINSS!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   descontoIRRF!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   descontoFaltas!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   adicionalHorasExtras!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   adicionalInsalubridade!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   adicionalPericulosidade!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   outrosDescontos!: number;
 
-  @Column('float', { default: 0 })
+  @Column('decimal', { precision: 10, scale: 2, default: 0 })
   outrosAcrescimos!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   salarioLiquido!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   fgts!: number;
 
   @Column({ type: 'enum', enum: StatusFolha, default: StatusFolha.RASCUNHO })
   status!: StatusFolha;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   observacao!: string;
 
   @CreateDateColumn()

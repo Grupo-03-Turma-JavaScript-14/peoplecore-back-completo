@@ -1,9 +1,9 @@
-import { Column, Entity } from 'typeorm';
-import { Funcionario } from '../../../funcionario/entities/funcionario.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tb_dependente' })
 export class Dependente {
-  @Column({ primary: true, generated: true })
+
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
@@ -12,11 +12,11 @@ export class Dependente {
   @Column()
   parentesco!: string;
 
-  @Column({ nullable: true })
-  telefone?: string;
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  telefone!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataNascimento?: string;
+  dataNascimento!: string;
 
   @Column()
   funcionarioId!: number;

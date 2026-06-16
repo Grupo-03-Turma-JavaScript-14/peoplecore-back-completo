@@ -24,7 +24,6 @@ export class Cat {
   @Column({ type: 'enum', enum: GravidadeAcidente })
   gravidade!: GravidadeAcidente;
 
-
   @Column({ type: 'timestamp' })
   dataAcidente!: Date;
 
@@ -37,28 +36,28 @@ export class Cat {
   @Column({ length: 255 })
   agenteCausador!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   localAcidente!: string;
 
   @Column({ default: false })
   enviadoEsocial!: boolean;
 
-  @Column({ length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 100, nullable: true })
   protocoloEsocial!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   planoAcao!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataAfastamento!: Date | null; 
+  dataAfastamento!: Date; 
 
   @Column({ type: 'date', nullable: true })
-  dataRetorno!: Date | null; 
+  dataRetorno!: Date; 
 
   @CreateDateColumn()
   criadoEm!: Date;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   urlDocumento!: string;
 
   @ManyToOne(() => Funcionario)

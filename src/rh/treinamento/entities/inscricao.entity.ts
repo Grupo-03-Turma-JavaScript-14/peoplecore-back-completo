@@ -24,10 +24,10 @@ export class Inscricao {
   @Column({ type: 'date', nullable: true })
   dataConclusao!: Date;
 
-  @Column('float', { nullable: true })
+  @Column('decimal', { precision: 4, scale: 2, nullable: true })
   nota!: number;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   observacao!: string;
 
   @CreateDateColumn()

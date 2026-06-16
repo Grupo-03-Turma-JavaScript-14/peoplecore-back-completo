@@ -23,7 +23,7 @@ export class Treinamento {
   @Column({ length: 255 })
   nome!: string;
 
-  @Column({ length: 1000, nullable: true })
+  @Column({ type: 'varchar', length: 1000, nullable: true })
   descricao!: string;
 
   @Column({ type: 'enum', enum: TipoTreinamento })
@@ -35,10 +35,10 @@ export class Treinamento {
   @Column()
   cargaHoraria!: number;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   nrRelacionada!: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'int', nullable: true })
   validadeMeses!: number;
 
   @Column({ default: true })

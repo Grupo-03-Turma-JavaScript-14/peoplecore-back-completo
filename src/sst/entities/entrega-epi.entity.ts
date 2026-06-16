@@ -28,7 +28,7 @@ export class EntregaEpi {
   @Column({ type: 'enum', enum: StatusEntregaEPI, default: StatusEntregaEPI.ATIVO })
   status!: StatusEntregaEPI;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   observacao!: string;
 
   @CreateDateColumn()

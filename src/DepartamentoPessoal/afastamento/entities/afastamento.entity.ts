@@ -15,10 +15,10 @@ export class Afastamento {
   dataInicio!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataFim?: string;
+  dataFim!: string;
 
-  @Column({ nullable: true })
-  motivo?: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  motivo!: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt!: Date;

@@ -22,13 +22,13 @@ export class Promocao {
   @Column({ length: 255 })
   cargoNovo!: string;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   salarioAnterior!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   salarioNovo!: number;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   motivo!: string;
 
   @CreateDateColumn()

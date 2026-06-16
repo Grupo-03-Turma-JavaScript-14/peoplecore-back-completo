@@ -21,7 +21,7 @@ export class RiscoAmbiental {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   descricao!: string;
 
   @Column({ type: 'enum', enum: TipoRisco })
@@ -30,16 +30,16 @@ export class RiscoAmbiental {
   @Column({ type: 'enum', enum: NivelRisco })
   nivel!: NivelRisco;
 
-  @Column({ length: 255 })
+  @Column({ type: 'varchar', length: 255 })
   setor!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   fonteGeradora!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   medidasControle!: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   epiNecessario!: string;
 
   @Column({ default: true })

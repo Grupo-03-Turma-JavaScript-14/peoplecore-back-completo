@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Categoria } from '../../departamento/entities/categoria.entity';
 
 @Entity('tb_funcao')
@@ -12,10 +12,10 @@ export class Funcao {
   @Column({ type: 'text', nullable: true })
   descricao!: string;
 
-  @Column({ length: 50, nullable: true })
+  @Column({ type: 'varchar', length: 50, nullable: true })
   nivel!: string; // Junior, Pleno, Senior, Especialista, Gerente
 
-  @Column('float', { nullable: true })
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
   salarioBaseSugerido!: number;
 
   @Column({ default: true })
@@ -27,7 +27,6 @@ export class Funcao {
   @UpdateDateColumn()
   atualizadoEm!: Date;
 
-  // Relacionamento com categorias
   @ManyToMany(() => Categoria)
   @JoinTable({
     name: 'tb_categoria_funcao',

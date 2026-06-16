@@ -32,7 +32,7 @@ export class Epi {
   @Column({ length: 255 })
   fabricante!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   descricao!: string;
 
   @Column({ default: 0 })

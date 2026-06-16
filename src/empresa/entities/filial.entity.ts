@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm';
 
 import { Empresa } from './empresa.entity';
@@ -14,28 +15,29 @@ export class Filial {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nome!: string;
 
-  @Column({ nullable: true })
-  cnpj?: string;
+  @Column({ type: 'varchar', length: 18, nullable: true })
+  cnpj!: string;
 
-  @Column({ nullable: true })
-  cidade?: string;
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  cidade!: string;
 
-  @Column({ nullable: true })
-  estado?: string;
+  @Column({ type: 'varchar', length: 2, nullable: true })
+  estado!: string;
 
   // ======================
   // SAAS CORE (OBRIGATÓRIO)
   // ======================
 
-  @Column()
+  @Column({ type: 'int', name: 'empresa_id' })
   empresaId!: number;
 
   @ManyToOne(() => Empresa, (empresa) => empresa.filiais, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'empresa_id' })
   empresa!: Empresa;
 
   // ======================

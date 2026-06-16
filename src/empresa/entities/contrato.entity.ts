@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn
 } from 'typeorm';
 
 import { Empresa } from './empresa.entity';
@@ -19,22 +20,20 @@ export class Contrato {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   nome!: string;
 
-  @Column({ nullable: true })
-  fornecedor?: string;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  fornecedor!: string;
 
-  @Column('decimal', { nullable: true })
-  valor?: number;
-
+  @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
+  valor!: number;
 
   @Column({ type: 'timestamp' })
   dataInicio!: Date;
 
-
   @Column({ type: 'timestamp', nullable: true })
-  dataFim?: Date;
+  dataFim!: Date;
 
   @Column({
     type: 'enum',
@@ -43,28 +42,24 @@ export class Contrato {
   })
   tipo!: TipoContrato;
 
-  // ======================
-  // SAAS CORE
-  // ======================
 
-  @Column()
+  @Column({ type: 'int', name: 'empresa_id' })
   empresaId!: number;
 
-  @Column({ nullable: true })
-  filialId?: number;
+  @Column({ type: 'int', name: 'filial_id', nullable: true })
+  filialId!: number;
 
-  // ======================
-  // RELAÇÕES
-  // ======================
 
   @ManyToOne(() => Empresa, (empresa) => empresa.contratos, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'empresa_id' })
   empresa!: Empresa;
 
   @ManyToOne(() => Filial, (filial) => filial.contratos, {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  filial?: Filial;
+  @JoinColumn({ name: 'filial_id' })
+  filial!: Filial;
 }

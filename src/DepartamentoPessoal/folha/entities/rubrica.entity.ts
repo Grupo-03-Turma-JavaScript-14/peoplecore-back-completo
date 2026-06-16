@@ -17,7 +17,7 @@ export class Rubrica {
   @Column({ type: 'enum', enum: TipoRubrica })
   tipo!: TipoRubrica;
 
-  @Column('float')
+  @Column('decimal', { precision: 10, scale: 2 })
   valor!: number;
 
   @ManyToOne(() => FolhaPagamento, { onDelete: 'CASCADE' })

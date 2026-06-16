@@ -35,16 +35,16 @@ export class Aso {
   @Column({ length: 255 })
   medicoResponsavel!: string;
 
-  @Column({ length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   crm!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   observacao!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   restricoes!: string;
 
-  @Column({ length: 500, nullable: true })
+  @Column({ type: 'varchar', length: 500, nullable: true })
   urlDocumento!: string;
 
   @CreateDateColumn()

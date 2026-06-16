@@ -11,8 +11,8 @@ export class Advertencia {
   @Column()
   motivo!: string;
 
-  @Column({ nullable: true })
-  descricao?: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  descricao!: string;
 
   @Column({ type: 'date' })
   data!: string;

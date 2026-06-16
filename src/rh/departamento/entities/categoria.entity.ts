@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 
 import { Funcionario } from "../../../funcionario/entities/funcionario.entity";
+import { Empresa } from "../../../empresa/entities/empresa.entity"; 
 
 @Entity({ name: "tb_categoria" })
 export class Categoria {
@@ -17,19 +18,19 @@ export class Categoria {
   id!: number;
 
   @IsNotEmpty()
-  @Column({ length: 255 })
+  @Column({ type: "varchar", length: 255 })
   departamento!: string;
 
   @OneToMany(() => Funcionario, (funcionario) => funcionario.categoria)
   funcionarios!: Funcionario[];
 
-  @Column({ nullable: true })
-  empresaId?: number;
+  @Column({ type: "int", name: "empresa_id", nullable: true })
+  empresaId!: number;
 
-  @ManyToOne('Empresa', 'categorias', {
+  @ManyToOne(() => Empresa, {
     nullable: true,
     onDelete: 'SET NULL'
   })
-  @JoinColumn({ name: 'empresaId' })
-  empresa?: any;
+  @JoinColumn({ name: 'empresa_id' }) 
+  empresa?: Empresa;
 }

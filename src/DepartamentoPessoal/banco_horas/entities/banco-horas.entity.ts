@@ -1,8 +1,8 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'tb_banco_horas' })
 export class BancoHoras {
-  @Column({ primary: true, generated: true })
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Column()
@@ -11,18 +11,19 @@ export class BancoHoras {
   @Column({ type: 'date' })
   data!: string;
 
-  @Column('float')
+  @Column('decimal', { precision: 6, scale: 2 })
   horasTrabalhadas!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 6, scale: 2 })
   horasExtras!: number;
 
-  @Column('float')
+  @Column('decimal', { precision: 6, scale: 2 })
   saldo!: number;
 
-  @Column({ nullable: true })
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
   tipo!: string; // crédito, débito, ajuste
 
-  @Column({ nullable: true })
-  observacao?: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  observacao!: string;
 }

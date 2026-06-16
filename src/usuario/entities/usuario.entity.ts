@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn
 } from 'typeorm';
 
 import { Empresa } from '../../empresa/entities/empresa.entity';
@@ -14,37 +15,36 @@ export class Usuario {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 150 })
   nome!: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   usuario!: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255 })
   senha!: string;
 
   @Column({ default: true })
   mustChangePassword!: boolean;
 
-  // 🌍 ROLE GLOBAL (plataforma SaaS)
   @Column({
     type: 'enum',
     enum: GlobalRole,
     nullable: true,
   })
-  globalRole?: GlobalRole;
+  globalRole!: GlobalRole;
 
-  // 🏢 ROLE DA EMPRESA
   @Column({
     type: 'enum',
     enum: CompanyRole,
     nullable: true,
   })
-  companyRole?: CompanyRole;
+  companyRole!: CompanyRole;
 
-  @Column({ nullable: true })
-  empresaId?: number;
+  @Column({ type: 'int', name: 'empresa_id', nullable: true })
+  empresaId!: number;
 
   @ManyToOne(() => Empresa)
+  @JoinColumn({ name: 'empresa_id' })
   empresa?: Empresa;
 }

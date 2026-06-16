@@ -29,13 +29,12 @@ export class Admissao {
   @Column()
   departamentoId!: number;
 
-  @Column({ nullable: true, length: 50 })
-  tipoContrato?: string;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  tipoContrato!: string;
 
-  @Column({ nullable: true, type: 'text' })
-  observacao?: string;
+  @Column({ type: 'text', nullable: true })
+  observacao!: string;
 
- 
   @CreateDateColumn()
   createdAt!: Date;
 

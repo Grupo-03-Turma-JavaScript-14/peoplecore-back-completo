@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn, 
   UpdateDateColumn 
 } from 'typeorm'; 
-// Substituímos o import do Funcionário pelo da Admissão
 import { Admissao } from '../../admissao/entities/admissao.entity'; 
 
 export enum TipoContratoTrabalho { 
@@ -45,31 +44,29 @@ export class ContratoTrabalho {
       from: (value: string | number) => typeof value === 'string' ? parseFloat(value) : value
     }
   }) 
-  salario?: number; 
+  salario!: number; 
 
   @Column({ type: 'date' }) 
   dataAdmissao!: Date; 
 
   @Column({ type: 'date', nullable: true }) 
-  dataFimExperiencia?: Date; 
+  dataFimExperiencia!: Date; 
 
   @Column({ type: 'date', nullable: true }) 
-  dataRescisao?: Date; 
+  dataRescisao!: Date; 
 
-  @Column({ length: 255, nullable: true }) 
-  motivoRescisao?: string; 
+  @Column({ type: 'varchar', length: 255, nullable: true }) 
+  motivoRescisao!: string; 
 
-  @Column({ length: 20, nullable: true }) 
-  ctps?: string; 
+  @Column({ type: 'varchar', length: 20, nullable: true }) 
+  ctps!: string; 
 
-  @Column({ length: 20, nullable: true }) 
-  pis?: string; 
+  @Column({ type: 'varchar', length: 20, nullable: true }) 
+  pis!: string; 
 
-  // 1. Mudamos a coluna física para armazenar o ID da Admissão
   @Column({ name: 'admissao_id' })
   admissaoId!: number;
 
-  // 2. Criamos o relacionamento direto com a Admissão correspondente
   @OneToOne(() => Admissao) 
   @JoinColumn({ name: 'admissao_id' }) 
   admissao!: Admissao; 
