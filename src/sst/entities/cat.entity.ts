@@ -24,7 +24,8 @@ export class Cat {
   @Column({ type: 'enum', enum: GravidadeAcidente })
   gravidade!: GravidadeAcidente;
 
-  @Column({ type: 'datetime' })
+
+  @Column({ type: 'timestamp' })
   dataAcidente!: Date;
 
   @Column({ length: 500 })
@@ -49,10 +50,10 @@ export class Cat {
   planoAcao!: string;
 
   @Column({ type: 'date', nullable: true })
-  dataAfastamento!: Date | null;  // ← ALTERADO
+  dataAfastamento!: Date | null; 
 
   @Column({ type: 'date', nullable: true })
-  dataRetorno!: Date | null;  // ← ALTERADO
+  dataRetorno!: Date | null; 
 
   @CreateDateColumn()
   criadoEm!: Date;

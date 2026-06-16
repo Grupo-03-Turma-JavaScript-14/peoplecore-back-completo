@@ -28,10 +28,12 @@ export class Contrato {
   @Column('decimal', { nullable: true })
   valor?: number;
 
-  @Column({ type: 'datetime' })
+
+  @Column({ type: 'timestamp' })
   dataInicio!: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+
+  @Column({ type: 'timestamp', nullable: true })
   dataFim?: Date;
 
   @Column({

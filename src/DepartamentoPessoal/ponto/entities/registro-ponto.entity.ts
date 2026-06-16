@@ -19,30 +19,29 @@ export enum StatusPonto {
 @Entity({ name: 'tb_registro_ponto' })
 export class RegistroPonto {
   @PrimaryGeneratedColumn()
-  id: number;
+  id!: number; // 
 
   @Column({ type: 'enum', enum: TipoRegistro })
-  tipo: TipoRegistro;
+  tipo!: TipoRegistro;
 
   @Column({ type: 'enum', enum: StatusPonto, default: StatusPonto.NORMAL })
-  status: StatusPonto;
-
-  @Column({ type: 'datetime' })
-  dataHora: Date;
+  status!: StatusPonto;
+  @Column({ type: 'timestamp' }) 
+  dataHora!: Date;
 
   @Column({ length: 500, nullable: true })
-  observacao: string;
+  observacao?: string | null;
 
   @Column({ nullable: true })
-  horasExtras: number;
+  horasExtras?: number | null;
 
   @Column({ length: 100, nullable: true })
-  localizacao: string;
+  localizacao?: string | null;
 
   @CreateDateColumn()
-  criadoEm: Date;
+  criadoEm!: Date;
 
   @ManyToOne(() => Funcionario)
   @JoinColumn({ name: 'funcionario_id' })
-  funcionario: Funcionario;
+  funcionario!: Funcionario;
 }
