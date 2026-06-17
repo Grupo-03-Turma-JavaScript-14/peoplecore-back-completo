@@ -1,18 +1,34 @@
 import {
-  Controller, Get, HttpStatus, HttpCode,
-  Param, ParseIntPipe, Post, Body, Put, Delete, UseGuards
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { JwtAuthGuard } from "../../../autenticacao/guards/jwt-auth.guard";
-import { CategoriaService } from "../services/categoria.service";
-import { Categoria } from "../entities/categoria.entity";
+  Controller,
+  Get,
+  HttpStatus,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Post,
+  Body,
+  Put,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { JwtAuthGuard } from '../../../autenticacao/guards/jwt-auth.guard';
+
+import { CategoriaService } from '../services/categoria.service';
+import { Categoria } from '../entities/categoria.entity';
+
+import { CreateCategoriaDto } from '../dto/create-categoria.dto';
+import { UpdateCategoriaDto } from '../dto/update-categoria.dto';
 
 @ApiTags('Departamentos')
-@Controller("/departamentos")
+@Controller('/departamentos')
 export class CategoriaController {
-  constructor(private readonly categoriaService: CategoriaService) { }
+  constructor(
+    private readonly categoriaService: CategoriaService,
+  ) {}
 
-  // ✅ Leitura: pública (GET pode ser acessado sem autenticação)
   @Get()
   @HttpCode(HttpStatus.OK)
   findAll(): Promise<Categoria[]> {
@@ -21,33 +37,39 @@ export class CategoriaController {
 
   @Get('/:id')
   @HttpCode(HttpStatus.OK)
-  findById(@Param('id', ParseIntPipe) id: number): Promise<Categoria> {
+  findById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Categoria> {
     return this.categoriaService.findById(id);
   }
 
   @Get('/descricao/:descricao')
   @HttpCode(HttpStatus.OK)
-  findAllBydescricao(@Param('descricao') departamento: string): Promise<Categoria[]> {
-    return this.categoriaService.findAllByDepartamento(departamento);
+  findAllBydescricao(
+    @Param('descricao') departamento: string,
+  ): Promise<Categoria[]> {
+    return this.categoriaService.findAllByDepartamento(
+      departamento,
+    );
   }
 
-  // ✅ Correção: escrita protegida com JwtAuthGuard
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() categoria: Categoria): Promise<Categoria> {
+  create(
+    @Body() categoria: CreateCategoriaDto,
+  ): Promise<Categoria> {
     return this.categoriaService.create(categoria);
   }
 
-  //  CORREÇÃO: Adicionado /:id na URL
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put('/:id')
   @HttpCode(HttpStatus.OK)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() categoria: Categoria
+    @Body() categoria: UpdateCategoriaDto,
   ): Promise<Categoria> {
     return this.categoriaService.update(id, categoria);
   }
@@ -56,7 +78,9 @@ export class CategoriaController {
   @UseGuards(JwtAuthGuard)
   @Delete('/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  delete(@Param('id', ParseIntPipe) id: number) {
+  delete(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
     return this.categoriaService.delete(id);
   }
 }
